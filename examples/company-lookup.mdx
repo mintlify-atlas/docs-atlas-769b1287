@@ -1,0 +1,236 @@
+---
+title: Company lookup
+description: Learn how to retrieve detailed information about specific companies listed on the Uganda Securities Exchange
+---
+
+This guide shows you how to look up detailed information about companies listed on the Uganda Securities Exchange using their ticker symbols.
+
+## Getting company details
+
+The `getCompanyDetails()` method retrieves comprehensive information about a specific company, including contact details, market capitalization, and listing information.
+
+### Basic company lookup
+
+<Steps>
+  <Step title="Initialize the library">
+    ```php
+    <?php
+    include 'PortfolioManager.php';
+    $portfolioManager = new PortfolioManager();
+    ```
+  </Step>
+
+  <Step title="Call getCompanyDetails()">
+    Pass the company ticker symbol as a parameter:
+
+    ```php
+    $companyDetails = $portfolioManager->getCompanyDetails('BOBU');
+    print_r($companyDetails);
+    ```
+
+    <Note>
+      The ticker symbol must match exactly as it appears on the Uganda Securities Exchange. Common symbols include BOBU, UCL, UMEME, and others.
+    </Note>
+  </Step>
+</Steps>
+
+## Code examples
+
+<CodeGroup>
+
+```php Single company
+<?php
+
+include 'PortfolioManager.php';
+
+$portfolioManager = new PortfolioManager();
+
+// Get details for Bank of Baroda Uganda
+$companyDetails = $portfolioManager->getCompanyDetails('BOBU');
+print_r($companyDetails);
+
+?>
+```
+
+```php Multiple companies
+<?php
+
+include 'PortfolioManager.php';
+
+$portfolioManager = new PortfolioManager();
+
+// Define companies to look up
+$companies = ['BOBU', 'UCL', 'UMEME'];
+
+// Loop through and get details for each
+foreach ($companies as $ticker) {
+    $details = $portfolioManager->getCompanyDetails($ticker);
+    echo "Details for $ticker:\n";
+    print_r($details);
+    echo "\n---\n\n";
+}
+
+?>
+```
+
+```php Decode and use data
+<?php
+
+include 'PortfolioManager.php';
+
+$portfolioManager = new PortfolioManager();
+
+// Get company details
+$jsonDetails = $portfolioManager->getCompanyDetails('BOBU');
+
+// Decode JSON to work with the data
+$company = json_decode($jsonDetails, true);
+
+// Access specific fields
+echo "Company: " . $company['companyName'] . "\n";
+echo "Market Cap: " . $company['marketCap'] . "\n";
+echo "Website: " . $company['website'] . "\n";
+echo "Email: " . $company['email'] . "\n";
+
+?>
+```
+
+</CodeGroup>
+
+## Expected response
+
+The `getCompanyDetails()` method returns a JSON object with the following structure:
+
+```json
+{
+  "companyName": "BOBU",
+  "logoURL": "https://www.use.or.ug/sites/default/files/company_logos/bobu_logo.png",
+  "isin": "UG0001000001",
+  "listingDate": "January 15, 2002",
+  "sharesIssued": "50,000,000",
+  "marketCap": "UGX 75,000,000,000",
+  "address": "Plot 18, Kampala Road, Kampala",
+  "phone": "+256 414 233 680",
+  "email": "info@bobu.co.ug",
+  "website": "https://www.bobu.co.ug"
+}
+```
+
+### Response fields
+
+| Field | Description |
+|-------|-------------|
+| `companyName` | The company's ticker symbol |
+| `logoURL` | URL to the company's logo image |
+| `isin` | International Securities Identification Number |
+| `listingDate` | Date the company was listed on the exchange |
+| `sharesIssued` | Total number of shares issued |
+| `marketCap` | Current market capitalization in UGX |
+| `address` | Company's physical address |
+| `phone` | Contact phone number |
+| `email` | Contact email address |
+| `website` | Company website URL |
+
+## Practical use cases
+
+### Building a company directory
+
+```php
+<?php
+
+include 'PortfolioManager.php';
+
+$portfolioManager = new PortfolioManager();
+
+// Get all companies first
+$allCompaniesJson = $portfolioManager->getAllPortfolioCompanies();
+$allCompanies = json_decode($allCompaniesJson, true);
+
+// Build a directory with full details
+$directory = [];
+foreach ($allCompanies as $company) {
+    $ticker = $company[0];
+    $detailsJson = $portfolioManager->getCompanyDetails($ticker);
+    $details = json_decode($detailsJson, true);
+    $directory[] = $details;
+}
+
+// Save to file or database
+file_put_contents('company_directory.json', json_encode($directory, JSON_PRETTY_PRINT));
+
+echo "Directory created with " . count($directory) . " companies.\n";
+
+?>
+```
+
+<Tip>
+  Combine `getAllPortfolioCompanies()` with `getCompanyDetails()` to build a comprehensive database of all listed companies.
+</Tip>
+
+### Creating a company profile page
+
+```php
+<?php
+
+include 'PortfolioManager.php';
+
+$portfolioManager = new PortfolioManager();
+
+// Get company from URL parameter (in a real application)
+$ticker = $_GET['ticker'] ?? 'BOBU';
+
+// Fetch company details
+$detailsJson = $portfolioManager->getCompanyDetails($ticker);
+$company = json_decode($detailsJson, true);
+
+// Display in HTML
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title><?php echo $company['companyName']; ?> - Company Profile</title>
+</head>
+<body>
+    <h1><?php echo $company['companyName']; ?></h1>
+    <img src="<?php echo $company['logoURL']; ?>" alt="Company Logo">
+    
+    <h2>Market Information</h2>
+    <p>Market Cap: <?php echo $company['marketCap']; ?></p>
+    <p>Shares Issued: <?php echo $company['sharesIssued']; ?></p>
+    <p>Listing Date: <?php echo $company['listingDate']; ?></p>
+    <p>ISIN: <?php echo $company['isin']; ?></p>
+    
+    <h2>Contact Information</h2>
+    <p>Address: <?php echo $company['address']; ?></p>
+    <p>Phone: <?php echo $company['phone']; ?></p>
+    <p>Email: <a href="mailto:<?php echo $company['email']; ?>"><?php echo $company['email']; ?></a></p>
+    <p>Website: <a href="<?php echo $company['website']; ?>"><?php echo $company['website']; ?></a></p>
+</body>
+</html>
+```
+
+## Error handling
+
+<Note>
+  The library will throw errors if the company ticker doesn't exist or if the USE website is unavailable. Always wrap your calls in try-catch blocks for production use.
+</Note>
+
+```php
+<?php
+
+try {
+    $portfolioManager = new PortfolioManager();
+    $details = $portfolioManager->getCompanyDetails('INVALID');
+    print_r($details);
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
+}
+
+?>
+```
+
+## Next steps
+
+<Card title="Market data" icon="chart-line" href="/examples/market-data">
+  Learn how to retrieve historical market data and exchange rates
+</Card>

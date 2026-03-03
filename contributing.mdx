@@ -1,0 +1,376 @@
+---
+title: Contributing
+description: Guidelines for contributing to the Uganda Securities Exchange API library
+---
+
+## Welcome contributors
+
+Contributions are welcome and encouraged! This library is an open-source project that benefits from community input. Whether you're fixing bugs, adding features, improving documentation, or sharing ideas, your contributions help make this library better for everyone.
+
+<Info>
+  The project maintainer welcomes contributions on how to make it better or any ideas for further implementation.
+</Info>
+
+## Ways to contribute
+
+There are many ways you can contribute to this project:
+
+- **Report bugs** - Found an issue? Let us know
+- **Suggest features** - Have an idea for improvement? Share it
+- **Fix issues** - Submit pull requests for known bugs
+- **Add features** - Implement new functionality
+- **Improve documentation** - Help others understand and use the library
+- **Write tests** - Increase code reliability and coverage
+- **Share use cases** - Show others how you're using the library
+
+## Getting started
+
+### Prerequisites
+
+Before contributing, ensure you have:
+
+- PHP >= 5.6 installed
+- Composer for dependency management
+- A local web server (XAMPP, WAMP, or any PHP server)
+- Git for version control
+- A GitHub account
+
+### Setting up your development environment
+
+<Accordion title="Step 1: Fork and clone the repository">
+  1. Fork the repository on GitHub
+  2. Clone your fork to your local machine:
+     ```bash
+     git clone https://github.com/your-username/repository-name.git
+     cd repository-name
+     ```
+  3. Add the upstream repository:
+     ```bash
+     git remote add upstream https://github.com/original/repository-name.git
+     ```
+</Accordion>
+
+<Accordion title="Step 2: Install dependencies">
+  Install project dependencies using Composer:
+  
+  ```bash
+  composer install
+  ```
+  
+  This will install the Simple HTML DOM Parser and other required packages.
+</Accordion>
+
+<Accordion title="Step 3: Start your development server">
+  Start your local PHP server:
+  
+  **Using XAMPP/WAMP:**
+  - Place the project in your htdocs/www directory
+  - Start Apache from the control panel
+  - Access via http://localhost/project-name
+  
+  **Using PHP built-in server:**
+  ```bash
+  php -S localhost:8000
+  ```
+</Accordion>
+
+<Accordion title="Step 4: Test the API">
+  Open `PortfolioManager.php` and uncomment the example usage at the bottom to test API features:
+  
+  ```php
+  // Test getting all companies
+  $allCompanies = $portfolioManager->getAllPortfolioCompanies();
+  print_r($allCompanies);
+  
+  // Test getting company details
+  $companyDetails = $portfolioManager->getCompanyDetails('BOBU');
+  print_r($companyDetails);
+  ```
+</Accordion>
+
+## Making changes
+
+### Creating a new branch
+
+Always create a new branch for your changes:
+
+```bash
+# Update your main branch
+git checkout main
+git pull upstream main
+
+# Create a new feature branch
+git checkout -b feature/your-feature-name
+```
+
+Branch naming conventions:
+- `feature/` - New features or enhancements
+- `fix/` - Bug fixes
+- `docs/` - Documentation updates
+- `refactor/` - Code refactoring
+
+### Code style guidelines
+
+<Note>
+  Follow PHP best practices and maintain consistency with the existing codebase.
+</Note>
+
+**General principles:**
+
+1. **Use meaningful variable names**
+   ```php
+   // Good
+   $companyName = 'BOBU';
+   $portfolioData = $this->getAllPortfolioCompanies();
+   
+   // Avoid
+   $cn = 'BOBU';
+   $data = $this->getData();
+   ```
+
+2. **Add comments for complex logic**
+   ```php
+   // Remove the callback function wrapper from the JSONP response
+   $jsonData = preg_replace('/^\?\(/', '', $jsonData);
+   $jsonData = preg_replace('/\);$/', '', $jsonData);
+   ```
+
+3. **Always clean up DOM objects**
+   ```php
+   // Release memory after use
+   $html->clear();
+   unset($html);
+   ```
+
+4. **Handle errors gracefully**
+   ```php
+   if (!$html) {
+       return json_encode(['error' => 'Unable to load HTML']);
+   }
+   ```
+
+5. **Use consistent indentation** (4 spaces)
+
+6. **Include PHPDoc comments for functions**
+   ```php
+   /**
+    * Retrieves details for a specific company
+    * 
+    * @param string $companyName The company ticker symbol
+    * @return string JSON-encoded company details
+    */
+   public function getCompanyDetails($companyName)
+   {
+       // Implementation
+   }
+   ```
+
+### Testing your changes
+
+Before submitting your contribution:
+
+1. **Test all affected functionality**
+   - Run existing test cases if available
+   - Manually test your changes
+   - Verify no existing functionality breaks
+
+2. **Test with different scenarios**
+   - Valid inputs
+   - Invalid inputs
+   - Edge cases
+   - Error conditions
+
+3. **Check for memory leaks**
+   ```php
+   // Monitor memory usage
+   echo 'Memory used: ' . memory_get_usage() . ' bytes\n';
+   ```
+
+4. **Verify cross-PHP version compatibility**
+   - Test with PHP 5.6+ if possible
+   - Avoid using features from newer PHP versions without checking compatibility
+
+## Submitting your contribution
+
+### Commit messages
+
+Write clear, descriptive commit messages:
+
+```bash
+# Good commit messages
+git commit -m "Add error handling for missing company data"
+git commit -m "Fix memory leak in getAllPortfolioCompanies method"
+git commit -m "Update documentation for getExchangeRateDetails"
+
+# Avoid vague messages
+git commit -m "Fixed stuff"
+git commit -m "Updates"
+```
+
+### Creating a pull request
+
+<Accordion title="Step 1: Push your changes">
+  ```bash
+  git push origin feature/your-feature-name
+  ```
+</Accordion>
+
+<Accordion title="Step 2: Open a pull request on GitHub">
+  1. Navigate to your fork on GitHub
+  2. Click "Compare & pull request"
+  3. Select the base repository and branch (usually `main`)
+  4. Fill out the pull request template
+</Accordion>
+
+<Accordion title="Step 3: Describe your changes">
+  **Include in your PR description:**
+  
+  - **What changed:** Brief summary of modifications
+  - **Why:** Reasoning behind the changes
+  - **Testing:** How you tested the changes
+  - **Screenshots:** If applicable (for UI changes)
+  - **Related issues:** Link to any related issues
+  
+  **Example:**
+  ```markdown
+  ## Summary
+  Added error handling for network timeouts when fetching market data
+  
+  ## Changes
+  - Added timeout configuration to stream context
+  - Implemented retry logic with exponential backoff
+  - Added error logging for debugging
+  
+  ## Testing
+  - Tested with various timeout scenarios
+  - Verified retry mechanism works correctly
+  - Confirmed error messages are helpful
+  
+  Fixes #42
+  ```
+</Accordion>
+
+## Types of contributions
+
+### Feature enhancements
+
+Ideas for new features:
+
+- Additional data endpoints from the USE website
+- Caching mechanism to reduce server load
+- Support for historical data analysis
+- Rate limiting and retry logic
+- WebSocket support for real-time updates
+- Database integration examples
+- REST API wrapper for the library
+
+<Warning>
+  For significant features, open an issue first to discuss the proposed changes before implementing.
+</Warning>
+
+### Bug fixes
+
+When fixing bugs:
+
+1. Create an issue describing the bug (if one doesn't exist)
+2. Reference the issue in your PR
+3. Include steps to reproduce the original bug
+4. Explain how your fix addresses the issue
+
+### Documentation improvements
+
+Documentation contributions are highly valued:
+
+- Add examples for common use cases
+- Clarify existing documentation
+- Fix typos and grammatical errors
+- Add code snippets and explanations
+- Create tutorials or guides
+- Translate documentation
+
+### Framework ports
+
+<Info>
+  The README mentions: "You can re-code it in any language/framework if you so deem necessary."
+</Info>
+
+Interested in porting this library to another language or framework?
+
+1. **Maintain core functionality:**
+   - All existing methods (getAllPortfolioCompanies, getCompanyDetails, etc.)
+   - Same data structure in responses
+   - Similar error handling approach
+
+2. **Create a separate repository** for the port
+
+3. **Link back to the original project** in your documentation
+
+4. **Share your port** so others can benefit
+
+Popular frameworks/languages to consider:
+- Python (using Beautiful Soup or Scrapy)
+- JavaScript/Node.js (using Cheerio or Puppeteer)
+- Ruby (using Nokogiri)
+- Go (using goquery)
+
+## Code review process
+
+After submitting a pull request:
+
+1. **Maintainer review** - The project maintainer will review your changes
+2. **Feedback** - You may receive comments or requests for modifications
+3. **Revisions** - Make requested changes and push to your branch
+4. **Approval** - Once approved, your PR will be merged
+
+<Note>
+  Be patient and responsive during the review process. Constructive feedback helps improve code quality.
+</Note>
+
+## Community guidelines
+
+### Be respectful
+
+- Treat all contributors with respect
+- Provide constructive feedback
+- Welcome newcomers and help them get started
+- Focus on the code, not the person
+
+### Be collaborative
+
+- Share knowledge and insights
+- Credit others for their contributions
+- Work together to solve problems
+- Celebrate successes
+
+### Be professional
+
+- Keep discussions on-topic
+- Avoid spam or promotional content
+- Respect intellectual property
+- Follow ethical web scraping practices
+
+## Legal considerations
+
+<Warning>
+  Remember: Production use requires approval from the Uganda Securities Commission.
+</Warning>
+
+When contributing:
+
+1. **Respect copyright** - Only contribute code you have the right to share
+2. **Comply with terms of service** - Ensure contributions don't violate USE website ToS
+3. **Document data sources** - Clearly indicate where data comes from
+4. **Include disclaimers** - Remind users about approval requirements
+
+## Questions?
+
+If you have questions about contributing:
+
+- Review this documentation
+- Check existing issues and pull requests
+- Look at the source code for examples
+- Reach out to the project maintainer
+
+<Info>
+  Your contributions, no matter how small, make a difference. Thank you for helping improve this project!
+</Info>

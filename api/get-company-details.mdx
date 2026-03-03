@@ -1,0 +1,173 @@
+---
+title: getCompanyDetails()
+description: Get detailed information about a specific company listed on the Uganda Securities Exchange
+---
+
+## Method signature
+
+```php
+public function getCompanyDetails($companyName)
+```
+
+Retrieves comprehensive details about a specific company, including contact information, market capitalization, and listing information.
+
+## Parameters
+
+<ParamField path="companyName" type="string" required>
+  The ticker symbol of the company (e.g., "BOBU", "DFCU")
+</ParamField>
+
+## Return value
+
+Returns a JSON-encoded string containing detailed company information.
+
+<Expandable title="Response fields">
+
+<ResponseField name="companyName" type="string">
+  The ticker symbol of the company
+</ResponseField>
+
+<ResponseField name="logoURL" type="string">
+  URL to the company's logo image
+</ResponseField>
+
+<ResponseField name="isin" type="string">
+  International Securities Identification Number (ISIN) of the company
+</ResponseField>
+
+<ResponseField name="listingDate" type="string">
+  Date when the company was listed on the exchange
+</ResponseField>
+
+<ResponseField name="sharesIssued" type="string">
+  Total number of shares issued by the company
+</ResponseField>
+
+<ResponseField name="marketCap" type="string">
+  Market capitalization of the company
+</ResponseField>
+
+<ResponseField name="address" type="string">
+  Physical address of the company
+</ResponseField>
+
+<ResponseField name="phone" type="string">
+  Contact phone number
+</ResponseField>
+
+<ResponseField name="email" type="string">
+  Contact email address
+</ResponseField>
+
+<ResponseField name="website" type="string">
+  Company website URL
+</ResponseField>
+
+</Expandable>
+
+## Response example
+
+<CodeGroup>
+
+```json Example response
+{
+  "companyName": "BOBU",
+  "logoURL": "https://www.use.or.ug/sites/default/files/logo.png",
+  "isin": "UG0001000123",
+  "listingDate": "January 15, 2020",
+  "sharesIssued": "1,000,000,000",
+  "marketCap": "UGX 1,250,000,000,000",
+  "address": "1234 Kampala Road, Kampala, Uganda",
+  "phone": "+256 123 456 789",
+  "email": "info@example.com",
+  "website": "https://www.example.com"
+}
+```
+
+</CodeGroup>
+
+## Usage example
+
+<CodeGroup>
+
+```php Basic usage
+<?php
+
+$portfolioManager = new PortfolioManager();
+
+// Get details for Bank of Baroda Uganda
+$companyDetails = $portfolioManager->getCompanyDetails('BOBU');
+
+// Output the JSON result
+echo $companyDetails;
+
+?>
+```
+
+```php Parse and use data
+<?php
+
+$portfolioManager = new PortfolioManager();
+
+// Get company details
+$companyDetailsJson = $portfolioManager->getCompanyDetails('BOBU');
+
+// Decode JSON to array
+$details = json_decode($companyDetailsJson, true);
+
+// Access specific fields
+echo "Company: " . $details['companyName'] . "\n";
+echo "Market Cap: " . $details['marketCap'] . "\n";
+echo "Website: " . $details['website'] . "\n";
+
+?>
+```
+
+```php Multiple companies
+<?php
+
+$portfolioManager = new PortfolioManager();
+
+$companies = ['BOBU', 'DFCU', 'STANBIC'];
+
+foreach ($companies as $ticker) {
+    $details = $portfolioManager->getCompanyDetails($ticker);
+    echo "Details for $ticker:\n";
+    echo $details . "\n\n";
+}
+
+?>
+```
+
+</CodeGroup>
+
+## How it works
+
+<Steps>
+  <Step title="Build company URL">
+    Constructs the URL using the format `https://www.use.or.ug/listed/{companyName}`
+  </Step>
+  
+  <Step title="Scrape company page">
+    Loads and parses the HTML content from the company's profile page
+  </Step>
+  
+  <Step title="Extract details">
+    Uses CSS selectors to extract specific company information from various div elements
+  </Step>
+  
+  <Step title="Format response">
+    Compiles all extracted data into an associative array and converts it to JSON
+  </Step>
+  
+  <Step title="Return JSON">
+    Returns the JSON-encoded company details with memory cleanup
+  </Step>
+</Steps>
+
+## Notes
+
+- The company name parameter should be the ticker symbol, not the full company name
+- Data is scraped in real-time from the USE website
+- Memory is explicitly cleared after parsing to optimize performance
+- The method relies on specific HTML structure and CSS classes from the USE website

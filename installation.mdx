@@ -1,0 +1,192 @@
+---
+title: Installation
+description: Install the Uganda Securities Exchange API library in your PHP project
+---
+
+## System requirements
+
+Before installing the library, ensure your environment meets these requirements:
+
+- **PHP**: Version 5.6 or higher
+- **ext-iconv**: Required for character encoding conversion
+
+### Recommended extensions
+
+- **ext-mbstring**: Provides better decoding for multi-byte documents
+- **ext-curl**: Enables cURL download support in the HtmlWeb class
+- **ext-openssl**: Allows loading HTTPS pages when using cURL
+
+## Installation methods
+
+<Note>
+  Currently, this library is not available on Packagist. Installation requires manual download and inclusion in your project.
+</Note>
+
+### Manual installation
+
+<Steps>
+  <Step title="Clone the repository">
+    Download the source code from GitHub:
+
+    ```bash
+    git clone https://github.com/jessebyarugaba/Unofficial-Uganda-Securities-Exhange-API.git
+    ```
+  </Step>
+
+  <Step title="Include the PortfolioManager class">
+    Copy the necessary files to your project directory:
+
+    ```bash
+    cp Unofficial-Uganda-Securities-Exhange-API/PortfolioManager.php /path/to/your/project/
+    cp Unofficial-Uganda-Securities-Exhange-API/simple_html_dom.php /path/to/your/project/
+    ```
+  </Step>
+
+  <Step title="Include in your PHP code">
+    Require the PortfolioManager class in your PHP files:
+
+    ```php
+    <?php
+    require_once 'PortfolioManager.php';
+
+    // Create an instance
+    $portfolioManager = new PortfolioManager();
+    ?>
+    ```
+  </Step>
+</Steps>
+
+### Alternative: Download as ZIP
+
+You can also download the repository as a ZIP file:
+
+1. Visit the [GitHub repository](https://github.com/jessebyarugaba/Unofficial-Uganda-Securities-Exhange-API)
+2. Click the green **Code** button
+3. Select **Download ZIP**
+4. Extract the files to your project directory
+5. Include `PortfolioManager.php` in your code
+
+## Verify installation
+
+Test your installation with this simple script:
+
+```php verify-installation.php
+<?php
+require_once 'PortfolioManager.php';
+
+// Create instance
+$portfolioManager = new PortfolioManager();
+
+// Test the connection
+try {
+    $companies = $portfolioManager->getAllPortfolioCompanies();
+    echo "Installation successful! Found companies data.\n";
+    echo $companies;
+} catch (Exception $e) {
+    echo "Installation error: " . $e->getMessage() . "\n";
+}
+?>
+```
+
+Run the script:
+
+```bash
+php verify-installation.php
+```
+
+If successful, you should see JSON output with company data from the Uganda Securities Exchange.
+
+## Web server setup
+
+To run the API in a web environment:
+
+<Tabs>
+  <Tab title="XAMPP">
+    1. Install [XAMPP](https://www.apachefriends.org/)
+    2. Copy project files to `C:\xampp\htdocs\use-api\` (Windows) or `/opt/lampp/htdocs/use-api/` (Linux)
+    3. Start Apache from the XAMPP control panel
+    4. Access via `http://localhost/use-api/PortfolioManager.php`
+  </Tab>
+  
+  <Tab title="WAMP">
+    1. Install [WAMP Server](https://www.wampserver.com/)
+    2. Copy project files to `C:\wamp64\www\use-api\`
+    3. Start WAMP services
+    4. Access via `http://localhost/use-api/PortfolioManager.php`
+  </Tab>
+  
+  <Tab title="Built-in PHP server">
+    For development purposes, use PHP's built-in server:
+
+    ```bash
+    cd /path/to/your/project
+    php -S localhost:8000
+    ```
+
+    Access via `http://localhost:8000/PortfolioManager.php`
+  </Tab>
+</Tabs>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Error: Unable to load HTML from the specified URL">
+    This error occurs when the library cannot connect to the Uganda Securities Exchange website.
+
+    **Solutions:**
+    - Check your internet connection
+    - Verify that `allow_url_fopen` is enabled in your php.ini:
+      ```ini
+      allow_url_fopen = On
+      ```
+    - Install the ext-curl extension for alternative HTTP methods
+    - Check if a firewall is blocking outbound connections
+  </Accordion>
+
+  <Accordion title="Character encoding issues">
+    If you see garbled text or encoding errors:
+
+    **Solutions:**
+    - Ensure ext-iconv is installed:
+      ```bash
+      php -m | grep iconv
+      ```
+    - Install ext-mbstring for better multi-byte support:
+      ```bash
+      sudo apt-get install php-mbstring  # Ubuntu/Debian
+      ```
+  </Accordion>
+
+  <Accordion title="SSL/HTTPS errors">
+    When accessing HTTPS URLs fails:
+
+    **Solutions:**
+    - Install ext-openssl:
+      ```bash
+      sudo apt-get install php-openssl  # Ubuntu/Debian
+      ```
+    - Update your CA certificates:
+      ```bash
+      sudo update-ca-certificates
+      ```
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Quickstart guide"
+    icon="rocket"
+    href="/quickstart"
+  >
+    Learn how to make your first API call
+  </Card>
+  <Card
+    title="API reference"
+    icon="code"
+    href="/api/portfolio-manager"
+  >
+    Explore all available methods
+  </Card>
+</CardGroup>

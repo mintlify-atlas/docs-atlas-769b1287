@@ -1,0 +1,136 @@
+---
+title: Introduction
+description: Unofficial PHP library to access market data from the Uganda Securities Exchange
+---
+
+<img
+  className="block dark:hidden"
+  src="/images/hero-light.svg"
+  alt="Uganda Securities Exchange API Hero Light"
+/>
+<img
+  className="hidden dark:block"
+  src="/images/hero-dark.svg"
+  alt="Uganda Securities Exchange API Hero Dark"
+/>
+
+## Welcome to the Uganda Securities Exchange API
+
+The Uganda Securities Exchange API is an unofficial PHP library that enables developers to programmatically access real-time market data from the [Uganda Securities Exchange](https://www.use.or.ug) website. Built on the robust Simple HTML DOM Parser, this library provides a straightforward interface for retrieving company listings, stock prices, and financial information.
+
+<Note>
+  This is an unofficial library that uses web scraping to retrieve data. For production use, please obtain approval from the Uganda Securities Commission.
+</Note>
+
+## Key features
+
+<CardGroup cols={2}>
+  <Card
+    title="Company listings"
+    icon="building"
+    href="/api/get-all-companies"
+  >
+    Retrieve all listed companies from the Uganda Securities Exchange market snapshot
+  </Card>
+  <Card
+    title="Company details"
+    icon="circle-info"
+    href="/api/get-company-details"
+  >
+    Fetch detailed information including ISIN, market cap, listing date, and contact details
+  </Card>
+  <Card
+    title="Historical stock data"
+    icon="chart-line"
+    href="/api/get-company-data"
+  >
+    Access historical price data with open, high, low, close values and trading volume
+  </Card>
+  <Card
+    title="Exchange rates"
+    icon="dollar-sign"
+    href="/api/get-exchange-rate"
+  >
+    Get current UGX to USD exchange rates and currency performance metrics
+  </Card>
+</CardGroup>
+
+## Get started
+
+<CardGroup cols={2}>
+  <Card
+    title="Installation"
+    icon="download"
+    href="/installation"
+  >
+    Install the library in your PHP project using Composer or manual download
+  </Card>
+  <Card
+    title="Quickstart"
+    icon="rocket"
+    href="/quickstart"
+  >
+    Get up and running with your first API call in minutes
+  </Card>
+  <Card
+    title="API reference"
+    icon="code"
+    href="/api/portfolio-manager"
+  >
+    Explore all available methods and their parameters
+  </Card>
+  <Card
+    title="Examples"
+    icon="lightbulb"
+    href="/examples/basic-usage"
+  >
+    Learn from practical code examples and common use cases
+  </Card>
+</CardGroup>
+
+## How it works
+
+The library uses web scraping to extract data from the Uganda Securities Exchange website. The `PortfolioManager` class provides four main methods:
+
+- `getAllPortfolioCompanies()` - Scrapes the market snapshot page for all listed companies
+- `getCompanyDetails($companyName)` - Retrieves detailed company information from individual listing pages
+- `getPortfolioCompanyData($companyName)` - Fetches historical OHLC price data from the exchange's data endpoint
+- `getExchangeRateDetails()` - Scrapes current UGX exchange rates from African Financials
+
+All methods return JSON-formatted data for easy integration with your applications.
+
+<Warning>
+  This library relies on web scraping and may break if the Uganda Securities Exchange website structure changes. Always implement proper error handling in production environments.
+</Warning>
+
+## Legal compliance
+
+Before using this library in production:
+
+1. Visit the [Uganda Securities Exchange website](https://www.use.or.ug)
+2. Contact the Uganda Securities Commission for data usage approval
+3. Ensure your use case complies with their terms of service
+4. Implement rate limiting to avoid overloading their servers
+
+See our [legal compliance guide](/concepts/legal-compliance) for more information.
+
+## Requirements
+
+- PHP 5.6 or higher
+- ext-iconv extension
+- Simple HTML DOM Parser (included)
+
+**Recommended:**
+- ext-mbstring for better multi-byte document decoding
+- ext-curl for cURL download support
+- ext-openssl for HTTPS page loading
+
+## Support
+
+This is an open-source project. For issues, questions, or contributions:
+
+- View the source code on [GitHub](https://github.com/jessebyarugaba/Unofficial-Uganda-Securities-Exhange-API)
+- Report bugs or request features via GitHub Issues
+- Contribute improvements via Pull Requests
+
+See our [contributing guide](/contributing) to get started.

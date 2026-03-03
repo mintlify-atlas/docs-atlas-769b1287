@@ -1,0 +1,309 @@
+---
+title: Changelog
+description: Version history and changes to the Uganda Securities Exchange API library
+---
+
+## About this changelog
+
+This page tracks notable changes, updates, and improvements to the Uganda Securities Exchange API library. The library utilizes [Simple HTML DOM Parser](https://simplehtmldom.sourceforge.io/) for web scraping functionality.
+
+<Info>
+  This project follows semantic versioning principles and is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) format.
+</Info>
+
+## Current version
+
+The Uganda Securities Exchange API library is built on top of Simple HTML DOM Parser. For the complete changelog of the underlying parser library, see the sections below.
+
+### Core functionality
+
+The library provides four main methods:
+
+1. **getAllPortfolioCompanies()** - Retrieves all companies listed on the USE
+2. **getCompanyDetails($companyName)** - Fetches detailed information for a specific company
+3. **getPortfolioCompanyData($companyName)** - Gets historical price data for plotting and analysis
+4. **getExchangeRateDetails()** - Retrieves current UGX to USD exchange rate
+
+<Note>
+  The library requires PHP >= 5.6 and the ext-iconv extension.
+</Note>
+
+## Simple HTML DOM Parser changelog
+
+The underlying HTML parsing functionality is provided by Simple HTML DOM Parser. Below are the major versions and their changes.
+
+### Unreleased
+
+<Accordion title="View unreleased changes">
+  **Changed:**
+  - Comments that start with `>` or `->` are now considered malformed in accordance with [section 12.1.6](https://html.spec.whatwg.org/multipage/syntax.html#comments) of the HTML specification
+  - Comments may still contain the strings `<!--` or `--!>` and may still end with `<!-` contrary to the specification
+</Accordion>
+
+### Version 2.0-RC2 (2019-11-09)
+
+<Warning>
+  This is a release candidate version. Some features might not yet be stable or may emit unexpected behavior.
+</Warning>
+
+<Accordion title="View 2.0-RC2 changes">
+  **Added:**
+  - README and composer file support
+  - Travis CI integration for automated unit tests
+  - Magic method `__debugInfo` to reduce memory footprint and prevent recursion errors
+  - Magic method `__call` as wrapper for deprecated lowercase methods
+  - New Debug class for deprecated functions and parsing issues
+  - Full support for script element parsing
+  - Multiple new unit tests for attributes, callbacks, debug info, doctypes, scripts, styles, and DOM manipulation
+
+  **Changed:**
+  - Improved garbage collection with better destructor implementation
+  - Enhanced handling of literal elements (script, style, cdata, comment, code)
+  - Renamed unit test files to match new class names
+
+  **Deprecated:**
+  - `HtmlDocument::clear()` - Use `unset()` instead
+  - `HtmlDocument::load_file()` - Use `HtmlDocument::loadFile()` instead
+  - `HtmlNode::children()` - Use `HtmlNode::childNodes()` instead
+  - `HtmlNode::first_child()` - Use `HtmlNode::firstChild()` instead
+  - `HtmlNode::has_child()` - Use `HtmlNode::hasChild()` instead
+  - `HtmlNode::last_child()` - Use `HtmlNode::lastChild()` instead
+  - `HtmlNode::next_sibling()` - Use `HtmlNode::nextSibling()` instead
+  - `HtmlNode::prev_sibling()` - Use `HtmlNode::previousSibling()` instead
+  - Smarty script support
+  - Server-side script support
+
+  **Fixed:**
+  - Boolean attributes incorrectly represented with value "1" when saving DOM
+  - Infinite loop bug with comments and CDATA containing script/style/code tags
+  - Whitespace removal in comments and CDATA with `$stripRN = true`
+  - Attribute value encoding in `outertext()`, `innertext()`, and `save()`
+  - Charset encoding issues [#178](https://sourceforge.net/p/simplehtmldom/bugs/178/)
+  - DOM manipulation bugs with `createElement()`, `createTextNode()`, and `appendChild()`
+</Accordion>
+
+### Version 2.0-RC1 (2019-10-20)
+
+<Accordion title="View 2.0-RC1 changes">
+  **Added:**
+  - Comprehensive unit test suite
+  - Optional `$trim` argument to `$node->text()`
+  - Attribute value normalization per W3C standards
+  - Automatic HTML entity decoding when loading documents
+  - Negation pseudo-class support (`:not()`)
+  - `simple_html_dom::expect()` and `simple_html_dom_node::expect()` methods
+  - CDATA section parsing
+  - HtmlWeb class for direct webpage loading via cURL or fopen
+  - New classes in simplehtmldom namespace: HtmlDocument, HtmlNode, HtmlWeb
+  - New element type `HDOM_TYPE_CDATA`
+
+  **Changed:**
+  - Increased `MAX_FILE_SIZE` from 0.6 MB to 2.5 MiB
+  - Enhanced `text()` method to support all block/inline elements
+  - Improved handling of `&nbsp` characters
+  - Moved classes to proper namespace structure
+  - Constants moved to separate file
+
+  **Fixed:**
+  - Fatal error when removing nodes from DOM (#172)
+  - UTF-8 character handling in `text()` method
+  - File size validation in `file_get_html`
+  - UTF-8 to UTF-8 conversion bug
+  - Optional closing tag handling
+  - Text node support in `find()` method (#175)
+</Accordion>
+
+### Version 1.9 (2019-05-30)
+
+<Accordion title="View 1.9 changes">
+  **Added:**
+  - Unit tests for bugs #153, #163, #166, #169
+  - Character set support for UTF-8, CP1251, CP1252 (#142)
+  - Meta charset detection
+  - CP1251 detection using iconv
+  - MIT LICENSE file
+  - New HtmlNode methods:
+    - `remove()` - Recursively remove node from DOM
+    - `removeChild()` - Remove child node
+    - `hasClass()` - Check for class name
+    - `addClass()` - Add classes
+    - `removeClass()` - Remove classes
+    - `save()` - Save node to disk
+
+  **Changed:**
+  - Documentation migrated to MkDocs
+
+  **Fixed:**
+  - Warning when clearing DOM on null nodes (#153)
+  - Missing whitespace in plaintext (#163)
+  - Duplicate attribute detection (#166)
+  - CP1252 (ISO-8859-1) detection (#142)
+  - Next-sibling combinator error on last child
+  - Selector parsing for attributes ending with "s" or "i" (#169)
+</Accordion>
+
+### Version 1.8 (2019-01-13)
+
+<Accordion title="View 1.8 changes">
+  **Added:**
+  - CSS combinator support:
+    - Child combinator (`>`)
+    - Next sibling combinator (`+`)
+    - Subsequent sibling combinator (`~`)
+  - Multiclass selectors (`.class.class.class`)
+  - Multi-attribute selectors (`[attr1][attr2]`)
+  - Attribute selector enhancements:
+    - Pipe selector (`|=`)
+    - Tilde selector (`~=`)
+    - Case sensitivity (`i` and `s`)
+  - PHP_CodeSniffer coding standards
+  - PHP 5.6+ compatibility tests
+  - Comprehensive CSS selector unit tests
+  - Configurable constants support
+
+  **Changed:**
+  - Removed automatic 'tbody' filtering (#79)
+  - Applied PHP_CodeSniffer standards
+
+  **Fixed:**
+  - CSS selector attributes with value "0" (#62)
+  - Forward slashes in CSS selectors (#144)
+  - Universal selectors
+  - `load_file` functionality
+</Accordion>
+
+### Version 1.7 (2018-12-10)
+
+<Accordion title="View 1.7 changes">
+  **Added:**
+  - Comprehensive code documentation
+  - Extensive unit test coverage
+  - Bit flags for `load()` method:
+    - `HDOM_SMARTY_AS_TEXT` - Filter Smarty scripts (#154)
+  - Support for attributes without whitespace separation
+  - Automated build script for releases
+
+  **Changed:**
+  - Updated self-closing tags list (added area, col, meta, param, source, track, wbr)
+  - Updated optional closing tags list (improved td/th/optgroup/option/rp/rt handling)
+  - Script tag removal before newline processing
+  - Improved performance (10-25% faster)
+  - Default `$offset` changed from -1 to 0 (#161)
+  - Normalized line endings to LF
+
+  **Deprecated:**
+  - `str_get_html()` - Use `new simple_html_dom()` instead
+
+  **Fixed:**
+  - PHP 7.3 compatibility
+  - Incorrectly escaped text handling (#160)
+  - `$maxLen` functionality in `file_get_html()`
+  - Cross-script error interference
+</Accordion>
+
+## Earlier versions
+
+<Accordion title="Versions 1.6 and earlier">
+  **Version 1.6 (2014-05-28):**
+  - Node insertion and creation
+  - Noise array search capability
+
+  **Version 1.5 (2012-09-10):**
+  - LOCK_EX flag for file operations
+  - Character set detection
+  - Memory leak fixes
+
+  **Version 1.11 (2008-12-14):**
+  - Firebug-generated XPath support
+  - New dump method and xmltext attribute
+  - Pre tag and various bug fixes
+
+  **Version 1.10 (2008-10-25):**
+  - Negative indexes in find method
+  - Automatic content loading
+  - Full wildcard support
+
+  **Version 1.00 (2008-09-05):**
+  - getAllAttributes method
+  - JavaScript string support in selectors
+  - Case-insensitive *= selector
+
+  See the [full CHANGELOG](https://github.com/simplehtmldom/simplehtmldom) for complete version history.
+</Accordion>
+
+## Usage notes
+
+<Warning>
+  **Important:** Use of this API for production purposes requires approval from the Uganda Securities Commission. Visit their website and contact them via email before deploying to production.
+</Warning>
+
+### Recommended practices
+
+1. **Always clean up DOM objects:**
+   ```php
+   $html->clear();
+   unset($html);
+   ```
+
+2. **Use camelCase methods** instead of deprecated snake_case:
+   ```php
+   // Preferred
+   $html->loadFile($url);
+   $node->firstChild();
+   
+   // Deprecated
+   $html->load_file($url);
+   $node->first_child();
+   ```
+
+3. **Implement error handling:**
+   ```php
+   if (!$html) {
+       error_log('Failed to load HTML');
+       return false;
+   }
+   ```
+
+4. **Monitor memory usage** for large documents:
+   ```php
+   ini_set('memory_limit', '256M');
+   ```
+
+## Migration notes
+
+If you're updating from an older version of Simple HTML DOM Parser:
+
+<Note>
+  Review the deprecated methods list and update your code to use the new camelCase naming convention.
+</Note>
+
+**Key changes to be aware of:**
+
+- Method names changed from snake_case to camelCase
+- Some methods have been deprecated or removed
+- Improved memory management requires proper cleanup
+- Enhanced CSS selector support
+- Better UTF-8 and character encoding handling
+
+## Future development
+
+Potential enhancements for future versions:
+
+- Caching layer to reduce server requests
+- Rate limiting for responsible web scraping
+- WebSocket support for real-time data
+- REST API wrapper
+- Database integration examples
+- Docker containerization
+- Comprehensive test suite specific to USE data
+
+<Info>
+  Contributions and suggestions for improvements are welcome! See the [Contributing](/contributing) guide to get involved.
+</Info>
+
+## Resources
+
+- [Simple HTML DOM Parser Documentation](https://simplehtmldom.sourceforge.io/docs/)
+- [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
+- [Semantic Versioning](https://semver.org/)
+- [Uganda Securities Exchange](https://www.use.or.ug/)

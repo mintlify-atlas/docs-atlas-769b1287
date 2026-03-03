@@ -1,0 +1,212 @@
+---
+title: getExchangeRateDetails()
+description: Get current UGX exchange rate information and currency data
+---
+
+## Method signature
+
+```php
+public function getExchangeRateDetails()
+```
+
+Retrieves current Uganda Shilling (UGX) exchange rate information, including the current value, daily change, yearly change, and 52-week range.
+
+## Parameters
+
+This method takes no parameters.
+
+## Return value
+
+Returns a JSON-encoded string containing exchange rate details and metadata.
+
+<Expandable title="Response structure">
+
+<ResponseField name="values" type="object">
+  Exchange rate metrics:
+  
+  <Expandable title="Values object">
+    <ResponseField name="VALUE/US$" type="string">
+      Current UGX to USD exchange rate
+    </ResponseField>
+    
+    <ResponseField name="TODAY'S CHANGE" type="string">
+      Change in exchange rate for the current day
+    </ResponseField>
+    
+    <ResponseField name="1 YEAR CHANGE" type="string">
+      Change in exchange rate over the past year
+    </ResponseField>
+    
+    <ResponseField name="52 WEEK RANGE" type="string">
+      Lowest and highest exchange rates over the past 52 weeks
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="disclaimer" type="string">
+  HTML content containing legal disclaimer from the data source
+</ResponseField>
+
+<ResponseField name="source" type="string">
+  URL of the data source (African Financials)
+</ResponseField>
+
+<ResponseField name="execution_time" type="number">
+  Time taken to execute the request in seconds (precise float value)
+</ResponseField>
+
+<ResponseField name="time in seconds" type="string">
+  Human-readable execution time rounded to 4 decimal places
+</ResponseField>
+
+</Expandable>
+
+## Response example
+
+<CodeGroup>
+
+```json Example response
+{
+  "values": {
+    "VALUE/US$": "3,750",
+    "TODAY'S CHANGE": "+5.00 (+0.13%)",
+    "1 YEAR CHANGE": "-125.00 (-3.23%)",
+    "52 WEEK RANGE": "3,650 - 3,875"
+  },
+  "disclaimer": "<p>Exchange rates are for informational purposes only...</p>",
+  "source": "https://africanfinancials.com/currency/ug-ugx/",
+  "execution_time": 1.2345,
+  "time in seconds": "1.2345 seconds"
+}
+```
+
+</CodeGroup>
+
+## Usage example
+
+<CodeGroup>
+
+```php Basic usage
+<?php
+
+$portfolioManager = new PortfolioManager();
+
+// Get exchange rate details
+$exchangeRates = $portfolioManager->getExchangeRateDetails();
+
+// Output the JSON result
+echo $exchangeRates;
+
+?>
+```
+
+```php Parse and display rates
+<?php
+
+$portfolioManager = new PortfolioManager();
+
+// Get exchange rate details
+$exchangeRatesJson = $portfolioManager->getExchangeRateDetails();
+
+// Decode JSON to array
+$rates = json_decode($exchangeRatesJson, true);
+
+// Display key information
+echo "Current Rate: " . $rates['values']['VALUE/US$'] . " UGX/USD\n";
+echo "Today's Change: " . $rates['values']["TODAY'S CHANGE"] . "\n";
+echo "1 Year Change: " . $rates['values']['1 YEAR CHANGE'] . "\n";
+echo "52 Week Range: " . $rates['values']['52 WEEK RANGE'] . "\n";
+echo "Execution Time: " . $rates['time in seconds'] . "\n";
+
+?>
+```
+
+```php Convert amounts
+<?php
+
+$portfolioManager = new PortfolioManager();
+
+$exchangeRatesJson = $portfolioManager->getExchangeRateDetails();
+$rates = json_decode($exchangeRatesJson, true);
+
+// Extract numeric exchange rate
+$rateString = $rates['values']['VALUE/US$'];
+$rate = floatval(str_replace(',', '', $rateString));
+
+// Convert USD to UGX
+$usdAmount = 100;
+$ugxAmount = $usdAmount * $rate;
+
+echo "$" . number_format($usdAmount, 2) . " = UGX " . number_format($ugxAmount, 2) . "\n";
+
+?>
+```
+
+</CodeGroup>
+
+## How it works
+
+<Steps>
+  <Step title="Record start time">
+    Captures the current microtime to measure execution duration
+  </Step>
+  
+  <Step title="Configure HTTP request">
+    Sets up user agent headers to mimic a browser request for proper data access
+  </Step>
+  
+  <Step title="Scrape currency page">
+    Fetches HTML content from African Financials currency page for UGX
+  </Step>
+  
+  <Step title="Extract rate data">
+    Parses the HTML to extract exchange rate values using CSS class selectors
+  </Step>
+  
+  <Step title="Build response">
+    Compiles all data including values, disclaimer, source URL, and execution time
+  </Step>
+  
+  <Step title="Return JSON">
+    Sets `Content-Type: application/json` header and returns the formatted JSON response
+  </Step>
+</Steps>
+
+## HTTP headers
+
+The method sets the following HTTP headers:
+
+- `Content-Type: application/json`
+
+For scraping, it uses:
+- `User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36...`
+
+## Data source
+
+Exchange rate data is sourced from:
+- **URL**: `https://africanfinancials.com/currency/ug-ugx/`
+- **Provider**: African Financials
+- **Update frequency**: Real-time scraping on each request
+
+## Error handling
+
+The method includes error handling for:
+
+<Warning>
+If the HTML fails to load, the method returns: `"Error: Couldn't load the HTML."`
+
+If the target data element is not found, it returns: `"Error: Couldn't find the target ul."`
+</Warning>
+
+## Performance
+
+- Execution time is tracked and included in the response
+- Typical execution time ranges from 0.5 to 2 seconds depending on network conditions
+- The DOM object is explicitly cleaned up after parsing to free memory
+
+## Notes
+
+- Exchange rate data is scraped in real-time from African Financials
+- The disclaimer field contains HTML markup and may include legal terms from the source
+- All numeric values are returned as strings and may include formatting (commas, percentage signs)
+- The method measures its own execution time for performance monitoring

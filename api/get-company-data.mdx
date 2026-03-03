@@ -1,0 +1,226 @@
+---
+title: getPortfolioCompanyData()
+description: Retrieve historical stock price data for a specific company
+---
+
+## Method signature
+
+```php
+public function getPortfolioCompanyData($companyName)
+```
+
+Retrieves historical stock price data including open, high, low, close, adjusted close, and volume for a specified company.
+
+## Parameters
+
+<ParamField path="companyName" type="string" required>
+  The ticker symbol of the company (e.g., "BOBU", "DFCU")
+</ParamField>
+
+## Return value
+
+Returns a JSON-encoded string (via echo) containing historical stock data, or a JSON error object if the request fails.
+
+<Expandable title="Response structure">
+
+<ResponseField name="stock" type="string">
+  The ticker symbol of the company
+</ResponseField>
+
+<ResponseField name="latestSharePrice" type="number">
+  The most recent closing price for the stock
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  Array of historical data points, each containing:
+  
+  <Expandable title="Data point fields">
+    <ResponseField name="date" type="string">
+      Human-readable date in format `Y-m-d H:i:s`
+    </ResponseField>
+    
+    <ResponseField name="timestamp" type="number">
+      Unix timestamp in milliseconds
+    </ResponseField>
+    
+    <ResponseField name="open" type="number">
+      Opening price for the period
+    </ResponseField>
+    
+    <ResponseField name="high" type="number">
+      Highest price during the period
+    </ResponseField>
+    
+    <ResponseField name="low" type="number">
+      Lowest price during the period
+    </ResponseField>
+    
+    <ResponseField name="close" type="number">
+      Closing price for the period
+    </ResponseField>
+    
+    <ResponseField name="adjusted_close" type="number">
+      Adjusted closing price accounting for corporate actions
+    </ResponseField>
+    
+    <ResponseField name="volume" type="number">
+      Trading volume for the period
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+</Expandable>
+
+## Response examples
+
+<CodeGroup>
+
+```json Success response
+{
+  "stock": "BOBU",
+  "data": [
+    {
+      "date": "2024-01-15 00:00:00",
+      "timestamp": 1705276800000,
+      "open": 1250,
+      "high": 1275,
+      "low": 1240,
+      "close": 1260,
+      "adjusted_close": 1260,
+      "volume": 15000
+    },
+    {
+      "date": "2024-01-16 00:00:00",
+      "timestamp": 1705363200000,
+      "open": 1260,
+      "high": 1280,
+      "low": 1255,
+      "close": 1270,
+      "adjusted_close": 1270,
+      "volume": 18500
+    }
+  ],
+  "latestSharePrice": 1270
+}
+```
+
+```json Error response
+{
+  "error": "Error decoding JSON data"
+}
+```
+
+</CodeGroup>
+
+## Usage example
+
+<CodeGroup>
+
+```php Basic usage
+<?php
+
+$portfolioManager = new PortfolioManager();
+
+// Get historical data for BOBU
+$portfolioManager->getPortfolioCompanyData('BOBU');
+// Data is echoed directly
+
+?>
+```
+
+```php Capture with output buffering
+<?php
+
+$portfolioManager = new PortfolioManager();
+
+// Use output buffering to capture the echoed result
+ob_start();
+$portfolioManager->getPortfolioCompanyData('BOBU');
+$companyData = ob_get_clean();
+
+// Parse the JSON data
+$data = json_decode($companyData, true);
+
+if (isset($data['error'])) {
+    echo "Error: " . $data['error'];
+} else {
+    echo "Stock: " . $data['stock'] . "\n";
+    echo "Latest Price: " . $data['latestSharePrice'] . "\n";
+    echo "Total Data Points: " . count($data['data']) . "\n";
+}
+
+?>
+```
+
+```php Analyze price trends
+<?php
+
+$portfolioManager = new PortfolioManager();
+
+ob_start();
+$portfolioManager->getPortfolioCompanyData('BOBU');
+$companyData = ob_get_clean();
+
+$data = json_decode($companyData, true);
+
+if (!isset($data['error'])) {
+    $prices = array_column($data['data'], 'close');
+    $avgPrice = array_sum($prices) / count($prices);
+    $maxPrice = max($prices);
+    $minPrice = min($prices);
+    
+    echo "Average: $avgPrice\n";
+    echo "High: $maxPrice\n";
+    echo "Low: $minPrice\n";
+}
+
+?>
+```
+
+</CodeGroup>
+
+## How it works
+
+<Steps>
+  <Step title="Build data URL">
+    Constructs the API endpoint: `https://www.use.or.ug/data.php?stock={companyName}&callback=?`
+  </Step>
+  
+  <Step title="Fetch JSON data">
+    Retrieves the data using `file_get_contents()` and strips the JSONP callback wrapper
+  </Step>
+  
+  <Step title="Transform data">
+    Converts numeric array indices to named keys (timestamp, open, high, low, close, adjusted_close, volume) and adds human-readable dates
+  </Step>
+  
+  <Step title="Build result">
+    Creates a result array with stock symbol, data array, and latest share price
+  </Step>
+  
+  <Step title="Output JSON">
+    Sets appropriate headers (`Content-Type: application/json` and CORS header) and echoes the result
+  </Step>
+</Steps>
+
+## HTTP headers
+
+The method sets the following HTTP headers:
+
+- `Content-Type: application/json`
+- `Access-Control-Allow-Origin: *` (enables CORS)
+
+On error, it sets:
+- `Content-Type: application/json`
+- `HTTP/1.1 500 Internal Server Error`
+
+## Notes
+
+<Note>
+This method uses `echo` to output the result directly, rather than returning it. Use output buffering (`ob_start()` and `ob_get_clean()`) if you need to capture the result as a variable.
+</Note>
+
+- The data source is the USE API endpoint at `data.php`
+- Timestamps are converted from milliseconds to human-readable format
+- The latest share price is extracted from the last data point in the array
+- CORS is enabled by default, allowing cross-origin requests

@@ -1,0 +1,110 @@
+---
+title: Basic usage
+description: Get started with the Uganda Securities Exchange API library with simple examples
+---
+
+This guide demonstrates the basic usage of the Uganda Securities Exchange API library, showing you how to instantiate the class and make simple method calls.
+
+## Installation
+
+<Steps>
+  <Step title="Include the library">
+    First, include the PortfolioManager class in your PHP file:
+
+    ```php
+    <?php
+    include 'PortfolioManager.php';
+    ```
+  </Step>
+
+  <Step title="Create an instance">
+    Instantiate the PortfolioManager class:
+
+    ```php
+    $portfolioManager = new PortfolioManager();
+    ```
+
+    <Note>
+      The constructor doesn't require any parameters. The library will handle all API connections automatically.
+    </Note>
+  </Step>
+
+  <Step title="Make your first API call">
+    Start retrieving data from the Uganda Securities Exchange:
+
+    ```php
+    // Get all listed companies
+    $allCompanies = $portfolioManager->getAllPortfolioCompanies();
+    print_r($allCompanies);
+    ```
+  </Step>
+</Steps>
+
+## Complete example
+
+Here's a complete working example that demonstrates basic instantiation and usage:
+
+```php
+<?php
+
+include 'PortfolioManager.php';
+
+// Create instance
+$portfolioManager = new PortfolioManager();
+
+// Get all portfolio companies
+$allCompanies = $portfolioManager->getAllPortfolioCompanies();
+print_r($allCompanies);
+
+?>
+```
+
+### Expected output
+
+The `getAllPortfolioCompanies()` method returns JSON data with all listed companies on the Uganda Securities Exchange:
+
+```json
+[
+  [
+    "BOBU",
+    "1,500",
+    "https://www.use.or.ug/listed/BOBU"
+  ],
+  [
+    "UCL",
+    "2,300",
+    "https://www.use.or.ug/listed/UCL"
+  ],
+  [
+    "UMEME",
+    "450",
+    "https://www.use.or.ug/listed/UMEME"
+  ]
+]
+```
+
+<Tip>
+  Each array contains the company ticker symbol, current share price, and a direct URL to the company's listing page.
+</Tip>
+
+## Available methods
+
+The PortfolioManager class provides four main methods:
+
+| Method | Description |
+|--------|-------------|
+| `getAllPortfolioCompanies()` | Returns all companies listed on the exchange |
+| `getCompanyDetails($companyName)` | Returns detailed information about a specific company |
+| `getPortfolioCompanyData($companyName)` | Returns historical market data for a company |
+| `getExchangeRateDetails()` | Returns current UGX exchange rate information |
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Company lookup" icon="building" href="/examples/company-lookup">
+    Learn how to retrieve detailed information about specific companies
+  </Card>
+  <Card title="Market data" icon="chart-line" href="/examples/market-data">
+    Explore how to work with historical market data and exchange rates
+  </Card>
+</CardGroup>

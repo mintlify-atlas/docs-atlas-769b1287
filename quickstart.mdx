@@ -1,80 +1,372 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quickstart
+description: Get started with the Uganda Securities Exchange API in minutes
 ---
 
-## Get started in three steps
+## Your first API call
 
-Get your documentation site running locally and make your first customization.
+This guide walks you through making your first request to retrieve market data from the Uganda Securities Exchange.
 
-### Step 1: Set up your local environment
+<Steps>
+  <Step title="Set up your project">
+    Create a new PHP file and include the PortfolioManager class:
+
+    ```php index.php
+    <?php
+    require_once 'PortfolioManager.php';
+
+    // Create an instance of PortfolioManager
+    $portfolioManager = new PortfolioManager();
+    ?>
+    ```
+
+    <Note>
+      Make sure you've completed the [installation steps](/installation) before proceeding.
+    </Note>
+  </Step>
+
+  <Step title="Fetch all listed companies">
+    Use the `getAllPortfolioCompanies()` method to retrieve all companies listed on the Uganda Securities Exchange:
+
+    ```php index.php
+    <?php
+    require_once 'PortfolioManager.php';
+
+    $portfolioManager = new PortfolioManager();
+
+    // Get all portfolio companies
+    $allCompanies = $portfolioManager->getAllPortfolioCompanies();
+
+    // Output the results
+    echo $allCompanies;
+    ?>
+    ```
+
+    This returns JSON data with company symbols, prices, and listing URLs.
+  </Step>
+
+  <Step title="Run your script">
+    Execute the script using PHP:
+
+    ```bash
+    php index.php
+    ```
+
+    You should see JSON output similar to:
+
+    ```json
+    [
+      [
+        "BOBU",
+        "1,250",
+        "https://www.use.or.ug/listed/BOBU"
+      ],
+      [
+        "UCL",
+        "850",
+        "https://www.use.or.ug/listed/UCL"
+      ]
+      // ... more companies
+    ]
+    ```
+  </Step>
+</Steps>
+
+## Working example
+
+Here's a complete example that demonstrates all four main API methods:
+
+<CodeGroup>
+```php Complete example
+<?php
+require_once 'PortfolioManager.php';
+
+// Create an instance
+$portfolioManager = new PortfolioManager();
+
+// 1. Get all portfolio companies
+$allCompanies = $portfolioManager->getAllPortfolioCompanies();
+echo "All Companies:\n";
+echo $allCompanies . "\n\n";
+
+// 2. Get details for a specific company (e.g., BOBU)
+$companyDetails = $portfolioManager->getCompanyDetails('BOBU');
+echo "Company Details for BOBU:\n";
+echo $companyDetails . "\n\n";
+
+// 3. Get historical data for a company
+$companyData = $portfolioManager->getPortfolioCompanyData('BOBU');
+echo "Historical Data for BOBU:\n";
+echo $companyData . "\n\n";
+
+// 4. Get current exchange rates
+$exchangeRates = $portfolioManager->getExchangeRateDetails();
+echo "Exchange Rates:\n";
+echo $exchangeRates . "\n";
+?>
+```
+
+```php Get company details
+<?php
+require_once 'PortfolioManager.php';
+
+$portfolioManager = new PortfolioManager();
+
+// Fetch detailed information for a specific company
+$companyDetails = $portfolioManager->getCompanyDetails('BOBU');
+
+// Decode JSON to work with the data
+$data = json_decode($companyDetails, true);
+
+echo "Company: " . $data['companyName'] . "\n";
+echo "ISIN: " . $data['isin'] . "\n";
+echo "Listing Date: " . $data['listingDate'] . "\n";
+echo "Market Cap: " . $data['marketCap'] . "\n";
+echo "Shares Issued: " . $data['sharesIssued'] . "\n";
+echo "Website: " . $data['website'] . "\n";
+?>
+```
+
+```php Get stock price data
+<?php
+require_once 'PortfolioManager.php';
+
+$portfolioManager = new PortfolioManager();
+
+// Get historical price data
+$companyData = $portfolioManager->getPortfolioCompanyData('BOBU');
+
+// Decode JSON
+$data = json_decode($companyData, true);
+
+echo "Stock: " . $data['stock'] . "\n";
+echo "Latest Share Price: " . $data['latestSharePrice'] . "\n\n";
+
+echo "Recent Price History:\n";
+// Display last 5 data points
+foreach (array_slice($data['data'], -5) as $point) {
+    echo "Date: " . $point['date'] . "\n";
+    echo "  Open: " . $point['open'] . "\n";
+    echo "  High: " . $point['high'] . "\n";
+    echo "  Low: " . $point['low'] . "\n";
+    echo "  Close: " . $point['close'] . "\n";
+    echo "  Volume: " . $point['volume'] . "\n\n";
+}
+?>
+```
+
+```php Get exchange rates
+<?php
+require_once 'PortfolioManager.php';
+
+$portfolioManager = new PortfolioManager();
+
+// Get current UGX exchange rates
+$exchangeRates = $portfolioManager->getExchangeRateDetails();
+
+// Decode JSON
+$data = json_decode($exchangeRates, true);
+
+echo "UGX Exchange Rate Information:\n";
+echo "Value/US$: " . $data['values']['VALUE/US$'] . "\n";
+echo "Today's Change: " . $data['values']["TODAY'S CHANGE"] . "\n";
+echo "1 Year Change: " . $data['values']['1 YEAR CHANGE'] . "\n";
+echo "52 Week Range: " . $data['values']['52 WEEK RANGE'] . "\n";
+echo "Execution Time: " . $data['time in seconds'] . "\n";
+?>
+```
+</CodeGroup>
+
+## Understanding the response
+
+Each method returns JSON-formatted data. Here's what to expect from each:
+
+### getAllPortfolioCompanies()
+
+Returns an array of companies with:
+- Company symbol (e.g., "BOBU")
+- Current price
+- URL to company details page
+
+### getCompanyDetails($companyName)
+
+Returns detailed company information:
+
+```json
+{
+  "companyName": "BOBU",
+  "logoURL": "https://www.use.or.ug/...",
+  "isin": "UG0001000201",
+  "listingDate": "January 1, 2000",
+  "sharesIssued": "1,000,000,000",
+  "marketCap": "UGX 1,250,000,000,000",
+  "address": "...",
+  "phone": "...",
+  "email": "...",
+  "website": "..."
+}
+```
+
+### getPortfolioCompanyData($companyName)
+
+Returns historical OHLC data:
+
+```json
+{
+  "stock": "BOBU",
+  "latestSharePrice": "1250",
+  "data": [
+    {
+      "date": "2024-01-15 00:00:00",
+      "timestamp": 1705276800000,
+      "open": "1250",
+      "high": "1275",
+      "low": "1240",
+      "close": "1250",
+      "adjusted_close": "1250",
+      "volume": "50000"
+    }
+    // ... more data points
+  ]
+}
+```
+
+### getExchangeRateDetails()
+
+Returns current UGX exchange rates:
+
+```json
+{
+  "values": {
+    "VALUE/US$": "3,750.00",
+    "TODAY'S CHANGE": "+0.25%",
+    "1 YEAR CHANGE": "-2.5%",
+    "52 WEEK RANGE": "3,650 - 3,850"
+  },
+  "disclaimer": "...",
+  "source": "https://africanfinancials.com/currency/ug-ugx/",
+  "execution_time": 1.2345,
+  "time in seconds": "1.2345 seconds"
+}
+```
+
+## Common use cases
+
+<CardGroup cols={2}>
+  <Card
+    title="Portfolio tracking"
+    icon="chart-mixed"
+    href="/examples/basic-usage"
+  >
+    Build a portfolio tracker that monitors your holdings
+  </Card>
+  <Card
+    title="Company lookup"
+    icon="magnifying-glass"
+    href="/examples/company-lookup"
+  >
+    Create a search interface for company information
+  </Card>
+  <Card
+    title="Market analysis"
+    icon="chart-line"
+    href="/examples/market-data"
+  >
+    Analyze historical price trends and patterns
+  </Card>
+  <Card
+    title="Price alerts"
+    icon="bell"
+    href="/examples/basic-usage"
+  >
+    Set up notifications for price movements
+  </Card>
+</CardGroup>
+
+## Best practices
+
+<Warning>
+  **Rate limiting**: Implement delays between requests to avoid overloading the Uganda Securities Exchange servers. Consider caching results for frequently accessed data.
+</Warning>
 
 <AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
+  <Accordion title="Error handling">
+    Always wrap API calls in try-catch blocks:
+
+    ```php
+    try {
+        $companies = $portfolioManager->getAllPortfolioCompanies();
+        // Process data
+    } catch (Exception $e) {
+        error_log("API Error: " . $e->getMessage());
+        // Handle error gracefully
+    }
+    ```
   </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
+
+  <Accordion title="Caching results">
+    Cache API responses to reduce load on the exchange website:
+
+    ```php
+    // Simple file-based cache example
+    $cacheFile = 'cache/companies.json';
+    $cacheTime = 3600; // 1 hour
+
+    if (file_exists($cacheFile) && (time() - filemtime($cacheFile) < $cacheTime)) {
+        $companies = file_get_contents($cacheFile);
+    } else {
+        $companies = $portfolioManager->getAllPortfolioCompanies();
+        file_put_contents($cacheFile, $companies);
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Input validation">
+    Validate company symbols before making API calls:
+
+    ```php
+    function isValidCompanySymbol($symbol) {
+        // Only allow alphanumeric characters
+        return preg_match('/^[A-Z0-9]+$/', $symbol);
+    }
+
+    $symbol = 'BOBU';
+    if (isValidCompanySymbol($symbol)) {
+        $details = $portfolioManager->getCompanyDetails($symbol);
+    }
+    ```
   </Accordion>
 </AccordionGroup>
-
-### Step 2: Deploy your changes
-
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
-
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
-
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 3: Go live
-
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
 
 ## Next steps
 
-Now that you have your docs running, explore these key features:
-
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card
+    title="API reference"
+    icon="book"
+    href="/api/portfolio-manager"
+  >
+    Explore all available methods and parameters
+  </Card>
+  <Card
+    title="Examples"
+    icon="code"
+    href="/examples/basic-usage"
+  >
+    View more detailed code examples
+  </Card>
+  <Card
+    title="Web scraping concepts"
+    icon="spider-web"
+    href="/concepts/web-scraping"
+  >
+    Learn how the library works under the hood
+  </Card>
+  <Card
+    title="Legal compliance"
+    icon="scale-balanced"
+    href="/concepts/legal-compliance"
+  >
+    Understand usage requirements and restrictions
+  </Card>
 </CardGroup>
-
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>

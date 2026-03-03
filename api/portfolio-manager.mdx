@@ -1,0 +1,81 @@
+---
+title: PortfolioManager class
+description: Overview of the PortfolioManager class for accessing Uganda Securities Exchange data
+---
+
+## Overview
+
+The `PortfolioManager` class provides methods to interact with the Uganda Securities Exchange (USE) API. It enables you to retrieve market data, company information, stock prices, and exchange rates.
+
+## Class structure
+
+```php
+class PortfolioManager
+{
+    public function __construct()
+    public function getAllPortfolioCompanies()
+    public function getCompanyDetails($companyName)
+    public function getPortfolioCompanyData($companyName)
+    public function getExchangeRateDetails()
+}
+```
+
+## Constructor
+
+```php
+public function __construct()
+```
+
+Initializes a new instance of the PortfolioManager class. No parameters are required.
+
+### Example
+
+```php
+$portfolioManager = new PortfolioManager();
+```
+
+## Available methods
+
+<CardGroup cols={2}>
+  <Card title="Get all companies" icon="building" href="/api/get-all-companies">
+    Retrieve all listed companies from the Uganda Securities Exchange
+  </Card>
+  <Card title="Get company details" icon="circle-info" href="/api/get-company-details">
+    Get detailed information about a specific company
+  </Card>
+  <Card title="Get company data" icon="chart-line" href="/api/get-company-data">
+    Retrieve historical stock price data for a company
+  </Card>
+  <Card title="Get exchange rate" icon="money-bill-transfer" href="/api/get-exchange-rate">
+    Get current UGX exchange rate information
+  </Card>
+</CardGroup>
+
+## Quick example
+
+```php
+<?php
+
+include 'PortfolioManager.php';
+
+// Initialize the manager
+$portfolioManager = new PortfolioManager();
+
+// Get all listed companies
+$allCompanies = $portfolioManager->getAllPortfolioCompanies();
+print_r($allCompanies);
+
+// Get details for a specific company
+$companyDetails = $portfolioManager->getCompanyDetails('BOBU');
+print_r($companyDetails);
+
+// Get historical data for a company
+$companyData = $portfolioManager->getPortfolioCompanyData('BOBU');
+print_r($companyData);
+
+// Get exchange rate information
+$exchangeRates = $portfolioManager->getExchangeRateDetails();
+print_r($exchangeRates);
+
+?>
+```

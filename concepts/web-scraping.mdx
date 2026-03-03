@@ -1,0 +1,215 @@
+---
+title: Web scraping
+description: Learn how the library uses Simple HTML DOM Parser to scrape data from the Uganda Securities Exchange website
+---
+
+## Overview
+
+The Uganda Securities Exchange API library retrieves market data through web scraping techniques. Since the USE does not provide an official public API, this library scrapes data directly from their website using the Simple HTML DOM Parser.
+
+<Info>
+This library uses the [Simple HTML DOM Parser](http://sourceforge.net/projects/simplehtmldom/) to parse and extract data from HTML pages.
+</Info>
+
+## How it works
+
+The library scrapes data from multiple sources to provide comprehensive market information:
+
+### Market snapshot data
+
+The `getAllPortfolioCompanies()` method scrapes the market snapshot page to retrieve all listed companies:
+
+```php
+$url = 'https://www.use.or.ug/content/market-snapshot';
+$html = file_get_html($url);
+```
+
+See implementation in `/home/daytona/workspace/source/PortfolioManager.php:18-20`
+
+The method:
+1. Loads the HTML from the market snapshot page
+2. Finds the table containing company data using CSS selectors
+3. Iterates through table rows (`<tr>`) and columns (`<td>`)
+4. Extracts text content and constructs company URLs
+5. Returns data in JSON format
+
+<Tip>
+The library automatically constructs company detail URLs by appending the company symbol to `https://www.use.or.ug/listed/`
+</Tip>
+
+### Company details
+
+The `getCompanyDetails()` method scrapes individual company pages to extract detailed information:
+
+```php
+$url = "https://www.use.or.ug/listed/" . $companyName;
+$html = file_get_html($url);
+```
+
+See implementation in `/home/daytona/workspace/source/PortfolioManager.php:78-99`
+
+This method uses specific CSS selectors to extract:
+- Company logo URL
+- ISIN (International Securities Identification Number)
+- Listing date
+- Shares issued
+- Market capitalization
+- Contact information (address, phone, email, website)
+
+### Stock price data
+
+The `getPortfolioCompanyData()` method retrieves historical stock price data from a JSON endpoint:
+
+```php
+$url = 'https://www.use.or.ug/data.php?stock=' . $companyName . '&callback=?';
+$jsonData = file_get_contents($url);
+```
+
+See implementation in `/home/daytona/workspace/source/PortfolioManager.php:125-128`
+
+<Note>
+This endpoint returns JSONP data, which the library cleans by removing the callback wrapper before parsing.
+</Note>
+
+### Exchange rate data
+
+The `getExchangeRateDetails()` method scrapes currency data from African Financials:
+
+```php
+$url = 'https://africanfinancials.com/currency/ug-ugx/';
+$html = file_get_html($url, false, $context);
+```
+
+See implementation in `/home/daytona/workspace/source/PortfolioManager.php:192-208`
+
+This method:
+- Sets a custom user agent to avoid blocking
+- Creates a stream context with appropriate headers
+- Extracts exchange rate values, changes, and ranges
+- Includes disclaimer content from the source
+- Tracks execution time for performance monitoring
+
+## Technical implementation
+
+### CSS selectors
+
+The library uses CSS selectors to target specific HTML elements:
+
+```php
+// Finding elements by class and tag
+$logoURL = $html->find('div.views-field-field-company-logo img', 0)->src;
+
+// Finding elements by class
+$isin = $html->find('div.views-field-field-isin div.field-content', 0)->innertext;
+
+// Finding all table rows
+foreach ($html->find('tr') as $row) {
+    // Process each row
+}
+```
+
+### Memory management
+
+The library properly releases memory after parsing HTML:
+
+```php
+// Release the memory occupied by the DOM object
+$html->clear();
+unset($html);
+```
+
+See implementation in `/home/daytona/workspace/source/PortfolioManager.php:66-67`
+
+<Warning>
+Always clear DOM objects after use to prevent memory leaks, especially when processing multiple pages.
+</Warning>
+
+### Error handling
+
+The library includes basic error handling for common scenarios:
+
+```php
+// Check if HTML was successfully loaded
+if (!$html) {
+    die('Unable to load HTML from the specified URL.');
+}
+
+// Check if target element was found
+if (!$table) {
+    die('No table found on the page.');
+}
+```
+
+See implementation in `/home/daytona/workspace/source/PortfolioManager.php:23-25`
+
+## Data format
+
+All methods return data in JSON format with appropriate headers:
+
+```php
+header('Content-Type: application/json');
+return json_encode($data, JSON_PRETTY_PRINT);
+```
+
+<Tip>
+The library uses `JSON_PRETTY_PRINT` flag to make the output human-readable, which is useful for debugging.
+</Tip>
+
+## Limitations
+
+### Website structure dependency
+
+The library depends on the current HTML structure of the USE website. If the website redesigns its pages or changes CSS classes, the scraping logic will need to be updated.
+
+### Performance considerations
+
+Web scraping involves:
+- HTTP requests to external websites
+- HTML parsing overhead
+- Potential network latency
+
+<Note>
+The exchange rate method includes execution time tracking to help monitor performance:
+```php
+$executionTime = $endTime - $startTime;
+```
+</Note>
+
+### Rate limiting
+
+Making too many requests in a short period may result in:
+- IP blocking
+- Temporary access restrictions
+- Server-side rate limiting
+
+<Warning>
+Implement appropriate delays between requests and consider caching results to minimize load on source websites.
+</Warning>
+
+## Best practices
+
+1. **Cache results**: Store scraped data to reduce unnecessary requests
+2. **Handle errors gracefully**: Always check if HTML loaded successfully before parsing
+3. **Respect robots.txt**: Check the website's robots.txt file for scraping policies
+4. **Monitor for changes**: Regularly test your scraping logic to detect website changes
+5. **Use appropriate user agents**: Some websites block requests without proper user agent headers
+
+## Example usage
+
+```php
+$portfolioManager = new PortfolioManager();
+
+// Get all listed companies
+$allCompanies = $portfolioManager->getAllPortfolioCompanies();
+
+// Get details for a specific company (e.g., Bank of Baroda Uganda)
+$companyDetails = $portfolioManager->getCompanyDetails('BOBU');
+
+// Get historical stock data
+$companyData = $portfolioManager->getPortfolioCompanyData('BOBU');
+
+// Get current exchange rates
+$exchangeRates = $portfolioManager->getExchangeRateDetails();
+```
+
+See examples in `/home/daytona/workspace/source/PortfolioManager.php:261-278`

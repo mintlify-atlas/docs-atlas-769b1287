@@ -1,0 +1,408 @@
+---
+title: Market data
+description: Learn how to retrieve and work with historical market data and exchange rates from the Uganda Securities Exchange
+---
+
+This guide demonstrates how to retrieve historical stock data and exchange rate information using the Uganda Securities Exchange API library.
+
+## Getting historical stock data
+
+The `getPortfolioCompanyData()` method retrieves historical OHLC (Open, High, Low, Close) data for a specific company, including volume and adjusted close prices.
+
+### Basic market data retrieval
+
+<Steps>
+  <Step title="Initialize the library">
+    ```php
+    <?php
+    include 'PortfolioManager.php';
+    $portfolioManager = new PortfolioManager();
+    ```
+  </Step>
+
+  <Step title="Fetch market data">
+    Pass the company ticker symbol to get historical data:
+
+    ```php
+    $companyData = $portfolioManager->getPortfolioCompanyData('BOBU');
+    print_r($companyData);
+    ```
+  </Step>
+</Steps>
+
+## Code examples
+
+<CodeGroup>
+
+```php Basic stock data
+<?php
+
+include 'PortfolioManager.php';
+
+$portfolioManager = new PortfolioManager();
+
+// Get historical data for Bank of Baroda Uganda
+$companyData = $portfolioManager->getPortfolioCompanyData('BOBU');
+print_r($companyData);
+
+?>
+```
+
+```php Latest share price
+<?php
+
+include 'PortfolioManager.php';
+
+$portfolioManager = new PortfolioManager();
+
+// Get data and extract latest price
+$dataJson = $portfolioManager->getPortfolioCompanyData('BOBU');
+$data = json_decode($dataJson, true);
+
+// The latest share price is included in the response
+echo "Current price for " . $data['stock'] . ": UGX " . $data['latestSharePrice'] . "\n";
+
+?>
+```
+
+```php Analyzing price trends
+<?php
+
+include 'PortfolioManager.php';
+
+$portfolioManager = new PortfolioManager();
+
+// Get historical data
+$dataJson = $portfolioManager->getPortfolioCompanyData('BOBU');
+$stockData = json_decode($dataJson, true);
+
+// Calculate statistics
+$prices = array_column($stockData['data'], 'close');
+$highestPrice = max($prices);
+$lowestPrice = min($prices);
+$averagePrice = array_sum($prices) / count($prices);
+
+echo "Stock: " . $stockData['stock'] . "\n";
+echo "Current Price: UGX " . $stockData['latestSharePrice'] . "\n";
+echo "Highest Price: UGX " . $highestPrice . "\n";
+echo "Lowest Price: UGX " . $lowestPrice . "\n";
+echo "Average Price: UGX " . round($averagePrice, 2) . "\n";
+echo "Data Points: " . count($stockData['data']) . "\n";
+
+?>
+```
+
+```php Volume analysis
+<?php
+
+include 'PortfolioManager.php';
+
+$portfolioManager = new PortfolioManager();
+
+// Get historical data
+$dataJson = $portfolioManager->getPortfolioCompanyData('UMEME');
+$stockData = json_decode($dataJson, true);
+
+// Analyze trading volume
+$totalVolume = 0;
+foreach ($stockData['data'] as $dataPoint) {
+    $totalVolume += $dataPoint['volume'];
+}
+
+$averageVolume = $totalVolume / count($stockData['data']);
+
+echo "Stock: " . $stockData['stock'] . "\n";
+echo "Total Volume Traded: " . number_format($totalVolume) . " shares\n";
+echo "Average Daily Volume: " . number_format($averageVolume) . " shares\n";
+
+?>
+```
+
+</CodeGroup>
+
+## Response structure
+
+The `getPortfolioCompanyData()` method returns a JSON object with this structure:
+
+```json
+{
+  "stock": "BOBU",
+  "data": [
+    {
+      "date": "2024-01-15 00:00:00",
+      "timestamp": 1705276800000,
+      "open": 1500,
+      "high": 1550,
+      "low": 1480,
+      "close": 1520,
+      "adjusted_close": 1520,
+      "volume": 125000
+    },
+    {
+      "date": "2024-01-16 00:00:00",
+      "timestamp": 1705363200000,
+      "open": 1520,
+      "high": 1580,
+      "low": 1515,
+      "close": 1560,
+      "adjusted_close": 1560,
+      "volume": 180000
+    }
+  ],
+  "latestSharePrice": 1560
+}
+```
+
+### Data fields
+
+| Field | Description |
+|-------|-------------|
+| `stock` | Company ticker symbol |
+| `data` | Array of historical data points |
+| `latestSharePrice` | Most recent closing price |
+| `date` | Human-readable date and time |
+| `timestamp` | Unix timestamp in milliseconds |
+| `open` | Opening price for the period |
+| `high` | Highest price during the period |
+| `low` | Lowest price during the period |
+| `close` | Closing price for the period |
+| `adjusted_close` | Adjusted closing price (accounts for splits, dividends) |
+| `volume` | Number of shares traded |
+
+<Tip>
+  The data array is sorted chronologically, with the most recent data point at the end. Use `end($data['data'])` to access the latest data point.
+</Tip>
+
+## Exchange rate data
+
+The `getExchangeRateDetails()` method retrieves current UGX exchange rate information from African Financials.
+
+### Getting exchange rates
+
+```php
+<?php
+
+include 'PortfolioManager.php';
+
+$portfolioManager = new PortfolioManager();
+
+// Get current exchange rate details
+$exchangeRates = $portfolioManager->getExchangeRateDetails();
+print_r($exchangeRates);
+
+?>
+```
+
+### Expected response
+
+```json
+{
+  "values": {
+    "VALUE/US$": "0.000271",
+    "TODAY'S CHANGE": "+0.000002 (+0.74%)",
+    "1 YEAR CHANGE": "-0.000015 (-5.25%)",
+    "52 WEEK RANGE": "0.000265 - 0.000288"
+  },
+  "disclaimer": "Exchange rates are updated daily...",
+  "source": "https://africanfinancials.com/currency/ug-ugx/",
+  "execution_time": 1.2345,
+  "time in seconds": "1.2345 seconds"
+}
+```
+
+### Working with exchange rates
+
+```php
+<?php
+
+include 'PortfolioManager.php';
+
+$portfolioManager = new PortfolioManager();
+
+// Get exchange rate data
+$ratesJson = $portfolioManager->getExchangeRateDetails();
+$rates = json_decode($ratesJson, true);
+
+// Extract the UGX to USD rate
+$ugxToUsd = floatval($rates['values']['VALUE/US$']);
+
+// Convert UGX amount to USD
+$amountUgx = 1000000; // 1 million UGX
+$amountUsd = $amountUgx * $ugxToUsd;
+
+echo "UGX " . number_format($amountUgx) . " = USD " . number_format($amountUsd, 2) . "\n";
+echo "Today's Change: " . $rates['values']["TODAY'S CHANGE"] . "\n";
+echo "52 Week Range: " . $rates['values']['52 WEEK RANGE'] . "\n";
+
+?>
+```
+
+## Practical applications
+
+### Stock performance dashboard
+
+```php
+<?php
+
+include 'PortfolioManager.php';
+
+$portfolioManager = new PortfolioManager();
+
+function getStockPerformance($ticker) {
+    global $portfolioManager;
+    
+    $dataJson = $portfolioManager->getPortfolioCompanyData($ticker);
+    $stockData = json_decode($dataJson, true);
+    
+    $data = $stockData['data'];
+    $firstPrice = $data[0]['close'];
+    $latestPrice = $stockData['latestSharePrice'];
+    
+    $priceChange = $latestPrice - $firstPrice;
+    $percentChange = ($priceChange / $firstPrice) * 100;
+    
+    return [
+        'ticker' => $ticker,
+        'currentPrice' => $latestPrice,
+        'priceChange' => $priceChange,
+        'percentChange' => round($percentChange, 2),
+        'dataPoints' => count($data)
+    ];
+}
+
+// Analyze multiple stocks
+$stocks = ['BOBU', 'UCL', 'UMEME'];
+
+foreach ($stocks as $ticker) {
+    $performance = getStockPerformance($ticker);
+    
+    echo "\n" . $performance['ticker'] . ":\n";
+    echo "  Current Price: UGX " . number_format($performance['currentPrice']) . "\n";
+    echo "  Change: UGX " . number_format($performance['priceChange']) . " (" . $performance['percentChange'] . "%)\n";
+    echo "  Historical Data Points: " . $performance['dataPoints'] . "\n";
+}
+
+?>
+```
+
+### Portfolio valuation with currency conversion
+
+```php
+<?php
+
+include 'PortfolioManager.php';
+
+$portfolioManager = new PortfolioManager();
+
+// Define portfolio holdings
+$portfolio = [
+    ['ticker' => 'BOBU', 'shares' => 1000],
+    ['ticker' => 'UCL', 'shares' => 500],
+    ['ticker' => 'UMEME', 'shares' => 750]
+];
+
+// Get exchange rate
+$ratesJson = $portfolioManager->getExchangeRateDetails();
+$rates = json_decode($ratesJson, true);
+$ugxToUsd = floatval($rates['values']['VALUE/US$']);
+
+// Calculate portfolio value
+$totalValueUgx = 0;
+
+foreach ($portfolio as &$holding) {
+    $dataJson = $portfolioManager->getPortfolioCompanyData($holding['ticker']);
+    $stockData = json_decode($dataJson, true);
+    
+    $currentPrice = $stockData['latestSharePrice'];
+    $holdingValue = $currentPrice * $holding['shares'];
+    
+    $holding['currentPrice'] = $currentPrice;
+    $holding['value'] = $holdingValue;
+    
+    $totalValueUgx += $holdingValue;
+}
+
+$totalValueUsd = $totalValueUgx * $ugxToUsd;
+
+// Display results
+echo "Portfolio Valuation\n";
+echo "===================\n\n";
+
+foreach ($portfolio as $holding) {
+    echo $holding['ticker'] . ": ";
+    echo $holding['shares'] . " shares @ UGX " . number_format($holding['currentPrice']) . " = ";
+    echo "UGX " . number_format($holding['value']) . "\n";
+}
+
+echo "\nTotal Value: UGX " . number_format($totalValueUgx) . "\n";
+echo "Total Value: USD " . number_format($totalValueUsd, 2) . "\n";
+echo "\nExchange Rate: 1 USD = " . number_format(1 / $ugxToUsd, 2) . " UGX\n";
+
+?>
+```
+
+<Note>
+  Exchange rate data is fetched from African Financials and includes execution time metrics. The API performs web scraping, so response times may vary.
+</Note>
+
+### CSV export for analysis
+
+```php
+<?php
+
+include 'PortfolioManager.php';
+
+$portfolioManager = new PortfolioManager();
+
+// Get stock data
+$dataJson = $portfolioManager->getPortfolioCompanyData('BOBU');
+$stockData = json_decode($dataJson, true);
+
+// Open CSV file for writing
+$filename = 'BOBU_historical_data.csv';
+$file = fopen($filename, 'w');
+
+// Write header
+fputcsv($file, ['Date', 'Open', 'High', 'Low', 'Close', 'Adjusted Close', 'Volume']);
+
+// Write data rows
+foreach ($stockData['data'] as $dataPoint) {
+    fputcsv($file, [
+        $dataPoint['date'],
+        $dataPoint['open'],
+        $dataPoint['high'],
+        $dataPoint['low'],
+        $dataPoint['close'],
+        $dataPoint['adjusted_close'],
+        $dataPoint['volume']
+    ]);
+}
+
+fclose($file);
+
+echo "Data exported to $filename\n";
+echo "Total records: " . count($stockData['data']) . "\n";
+
+?>
+```
+
+## Performance considerations
+
+<Tip>
+  The library performs web scraping to retrieve data. For production applications:
+  - Cache responses to reduce API calls
+  - Implement rate limiting to avoid overloading the USE servers
+  - Handle timeouts and network errors gracefully
+  - The `getExchangeRateDetails()` method includes execution time metrics for monitoring
+</Tip>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Basic usage" icon="rocket" href="/examples/basic-usage">
+    Review the basics of using the library
+  </Card>
+  <Card title="Company lookup" icon="building" href="/examples/company-lookup">
+    Learn how to retrieve company details
+  </Card>
+</CardGroup>

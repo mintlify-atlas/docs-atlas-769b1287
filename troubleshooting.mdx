@@ -1,0 +1,280 @@
+---
+title: Troubleshooting
+description: Common issues and solutions when working with the Uganda Securities Exchange API library
+---
+
+## Common issues
+
+This guide covers common issues you might encounter when using the Uganda Securities Exchange API library and their solutions.
+
+<Accordion title="Unable to load HTML from URL">
+  <Warning>
+    This error occurs when the library cannot fetch data from the Uganda Securities Exchange website or other external sources.
+  </Warning>
+
+  **Possible causes:**
+  - Network connectivity issues
+  - The target website is down or temporarily unavailable
+  - Server firewall blocking outbound requests
+  - SSL/TLS certificate issues
+
+  **Solutions:**
+  1. Verify your internet connection is working
+  2. Check if the USE website (https://www.use.or.ug) is accessible in your browser
+  3. Ensure your PHP installation has `allow_url_fopen` enabled in php.ini:
+     ```ini
+     allow_url_fopen = On
+     ```
+  4. If using cURL, verify the `ext-curl` and `ext-openssl` extensions are installed:
+     ```bash
+     php -m | grep curl
+     php -m | grep openssl
+     ```
+</Accordion>
+
+<Accordion title="No table found on the page">
+  **Issue:** The scraper cannot locate the expected table structure on the webpage.
+
+  **Possible causes:**
+  - The website structure has changed
+  - JavaScript-rendered content (not accessible to PHP DOM parser)
+  - Incorrect selector
+
+  **Solutions:**
+  1. Inspect the current website structure to verify the table still exists
+  2. Check if the content requires JavaScript to load (this library only works with static HTML)
+  3. Update your selectors if the website structure has changed
+  4. Consider implementing error handling:
+     ```php
+     $table = $html->find('table', 0);
+     if (!$table) {
+         // Handle missing table gracefully
+         error_log('Table not found on page');
+         return [];
+     }
+     ```
+</Accordion>
+
+<Accordion title="Memory limit exceeded errors">
+  <Warning>
+    Large HTML documents can consume significant memory during parsing.
+  </Warning>
+
+  **Solutions:**
+  1. Increase PHP memory limit in php.ini:
+     ```ini
+     memory_limit = 256M
+     ```
+  2. Or set it at runtime in your script:
+     ```php
+     ini_set('memory_limit', '256M');
+     ```
+  3. Always clear DOM objects after use:
+     ```php
+     $html->clear();
+     unset($html);
+     ```
+  4. Process data in smaller chunks when possible
+</Accordion>
+
+<Accordion title="Encoding and character set issues">
+  **Issue:** Special characters or non-ASCII text appears garbled.
+
+  **Solutions:**
+  1. Ensure the `ext-iconv` extension is installed (required dependency):
+     ```bash
+     php -m | grep iconv
+     ```
+  2. Install the optional `ext-mbstring` extension for better multi-byte character support:
+     ```bash
+     # Ubuntu/Debian
+     sudo apt-get install php-mbstring
+     
+     # CentOS/RHEL
+     sudo yum install php-mbstring
+     ```
+  3. Verify your database and files are using UTF-8 encoding
+</Accordion>
+
+<Accordion title="Composer dependency installation fails">
+  **Issue:** Unable to install the Simple HTML DOM Parser dependency.
+
+  **Solutions:**
+  1. Ensure Composer is installed and up to date:
+     ```bash
+     composer --version
+     composer self-update
+     ```
+  2. Check PHP version meets minimum requirement (PHP >= 5.6):
+     ```bash
+     php -v
+     ```
+  3. Clear Composer cache and try again:
+     ```bash
+     composer clear-cache
+     composer install
+     ```
+  4. If behind a proxy, configure Composer proxy settings
+</Accordion>
+
+<Accordion title="Selectors not finding elements">
+  **Issue:** CSS selectors return no results even though elements exist.
+
+  **Common mistakes:**
+  - Using incorrect selector syntax
+  - Assuming JavaScript-modified DOM structure
+  - Whitespace or formatting differences
+
+  **Solutions:**
+  1. Test selectors incrementally from parent to child
+  2. View the actual HTML source (not browser inspector which may show JS-modified DOM)
+  3. Use more flexible selectors:
+     ```php
+     // Instead of specific classes that might change
+     $element = $html->find('div.specific-class', 0);
+     
+     // Use more general selectors
+     $element = $html->find('div[class*="partial-class"]', 0);
+     ```
+  4. Add debugging to see what's actually found:
+     ```php
+     $elements = $html->find('your-selector');
+     error_log('Found ' . count($elements) . ' elements');
+     ```
+</Accordion>
+
+## PHP environment issues
+
+<Note>
+  The Uganda Securities Exchange API library requires specific PHP extensions and configurations.
+</Note>
+
+### Required extensions
+
+Verify all required extensions are installed:
+
+```bash
+php -m | grep -E "iconv|curl|openssl|mbstring"
+```
+
+**Required:**
+- `ext-iconv` - Character encoding conversion
+- PHP >= 5.6
+
+**Recommended:**
+- `ext-curl` - HTTP requests (especially for HTTPS)
+- `ext-openssl` - SSL/TLS support
+- `ext-mbstring` - Multi-byte string handling
+
+### Server configuration
+
+Ensure these php.ini settings are properly configured:
+
+```ini
+; Allow URL file operations
+allow_url_fopen = On
+
+; Increase limits for web scraping
+max_execution_time = 60
+memory_limit = 256M
+
+; Error reporting during development
+error_reporting = E_ALL
+display_errors = On
+```
+
+## Web scraping best practices
+
+<Info>
+  Following these practices helps prevent issues and ensures reliable operation.
+</Info>
+
+### Rate limiting
+
+Implement delays between requests to avoid overwhelming the target server:
+
+```php
+// Add delay between requests
+sleep(1); // Wait 1 second
+
+// Or use microseconds for shorter delays
+usleep(500000); // Wait 0.5 seconds
+```
+
+### Error handling
+
+Always implement proper error handling:
+
+```php
+try {
+    $html = file_get_html($url);
+    
+    if (!$html) {
+        throw new Exception('Failed to load HTML');
+    }
+    
+    // Process HTML
+    
+    $html->clear();
+    unset($html);
+    
+} catch (Exception $e) {
+    error_log('Scraping error: ' . $e->getMessage());
+    // Return graceful error response
+    return json_encode(['error' => 'Unable to fetch data']);
+}
+```
+
+### User agent configuration
+
+Some websites require a valid user agent:
+
+```php
+$userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
+
+$options = [
+    'http' => [
+        'header' => 'User-Agent: ' . $userAgent,
+    ],
+];
+
+$context = stream_context_create($options);
+$html = file_get_html($url, false, $context);
+```
+
+## Legal and ethical considerations
+
+<Warning>
+  **Important:** Production use requires approval from the Uganda Securities Commission.
+</Warning>
+
+Before deploying this library in a production environment:
+
+1. Review the Uganda Securities Exchange website's terms of service
+2. Contact the Uganda Securities Commission for permission
+3. Email them explaining your intended use case
+4. Wait for explicit approval before proceeding
+
+Visit the [Uganda Securities Exchange website](https://www.use.or.ug) for contact information.
+
+## Getting help
+
+If you continue experiencing issues:
+
+1. Check the [Simple HTML DOM Parser documentation](https://simplehtmldom.sourceforge.io/docs/)
+2. Review the [source code examples](https://github.com/your-repo/examples) in the repository
+3. Enable PHP error logging to capture detailed error messages:
+   ```php
+   error_reporting(E_ALL);
+   ini_set('display_errors', 1);
+   ini_set('log_errors', 1);
+   ini_set('error_log', '/path/to/error.log');
+   ```
+4. Test your PHP environment configuration:
+   ```bash
+   php -i | grep -E "allow_url_fopen|memory_limit|max_execution_time"
+   ```
+
+<Info>
+  When reporting issues, include your PHP version, installed extensions, and relevant error messages.
+</Info>

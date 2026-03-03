@@ -1,0 +1,127 @@
+---
+title: getAllPortfolioCompanies()
+description: Retrieve all listed companies from the Uganda Securities Exchange
+---
+
+## Method signature
+
+```php
+public function getAllPortfolioCompanies()
+```
+
+Retrieves a list of all companies listed on the Uganda Securities Exchange, including their current market data.
+
+## Parameters
+
+This method takes no parameters.
+
+## Return value
+
+Returns a JSON-encoded string containing an array of companies. Each company is represented as an array with the following structure:
+
+<ResponseField name="[0]" type="string">
+  Company ticker symbol (e.g., "BOBU")
+</ResponseField>
+
+<ResponseField name="[1]" type="string">
+  Company name or additional data from the market snapshot
+</ResponseField>
+
+<ResponseField name="[2]" type="string">
+  Additional market data field
+</ResponseField>
+
+<ResponseField name="[n]" type="string">
+  URL to the company's profile page on USE website (format: `https://www.use.or.ug/listed/{ticker}`)
+</ResponseField>
+
+## Response example
+
+<CodeGroup>
+
+```json Example response
+[
+  [
+    "BOBU",
+    "Bank of Baroda Uganda",
+    "1,250",
+    "https://www.use.or.ug/listed/BOBU"
+  ],
+  [
+    "DFCU",
+    "DFCU Bank",
+    "850",
+    "https://www.use.or.ug/listed/DFCU"
+  ]
+]
+```
+
+</CodeGroup>
+
+## Usage example
+
+<CodeGroup>
+
+```php Basic usage
+<?php
+
+$portfolioManager = new PortfolioManager();
+
+// Get all portfolio companies
+$allCompanies = $portfolioManager->getAllPortfolioCompanies();
+
+// Output the JSON result
+echo $allCompanies;
+
+?>
+```
+
+```php Parse and iterate
+<?php
+
+$portfolioManager = new PortfolioManager();
+
+// Get all portfolio companies
+$allCompaniesJson = $portfolioManager->getAllPortfolioCompanies();
+
+// Decode JSON to array
+$companies = json_decode($allCompaniesJson, true);
+
+// Iterate through companies
+foreach ($companies as $company) {
+    $ticker = $company[0];
+    $url = end($company);
+    echo "Company: $ticker - URL: $url\n";
+}
+
+?>
+```
+
+</CodeGroup>
+
+## How it works
+
+<Steps>
+  <Step title="Fetch market snapshot">
+    The method scrapes data from the USE market snapshot page at `https://www.use.or.ug/content/market-snapshot`
+  </Step>
+  
+  <Step title="Parse table data">
+    Extracts company information from the HTML table structure on the page
+  </Step>
+  
+  <Step title="Build URLs">
+    Appends a direct link to each company's profile page in the format `https://www.use.or.ug/listed/{ticker}`
+  </Step>
+  
+  <Step title="Return JSON">
+    Converts the data to JSON format and returns it with appropriate `Content-Type: application/json` header
+  </Step>
+</Steps>
+
+## Notes
+
+- The method sets the HTTP header `Content-Type: application/json`
+- Data is scraped in real-time from the Uganda Securities Exchange website
+- The exact number and structure of fields may vary based on the USE website's table structure
+- Memory is explicitly cleared after parsing to optimize performance

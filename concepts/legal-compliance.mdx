@@ -1,0 +1,254 @@
+---
+title: Legal compliance
+description: Understand the legal considerations and compliance requirements when using the Uganda Securities Exchange API library
+---
+
+## Overview
+
+The Uganda Securities Exchange API is an **unofficial** library that scrapes data from publicly available websites. Before using this library in production, you must understand the legal implications and compliance requirements.
+
+<Warning>
+This is an unofficial API. Use of this library for production purposes requires approval from the Uganda Securities Commission.
+</Warning>
+
+## Regulatory approval
+
+### Uganda Securities Commission
+
+The Uganda Securities Commission (USC) regulates the securities industry in Uganda. Using scraped data from the USE website for commercial or production purposes requires their explicit approval.
+
+<Info>
+You must contact the Uganda Securities Commission before deploying this library in a production environment.
+</Info>
+
+### How to obtain approval
+
+1. Visit the [Uganda Securities Commission website](https://www.use.or.ug/)
+2. Contact them via email to request permission
+3. Explain your intended use case and how you plan to use the data
+4. Wait for written approval before proceeding with production deployment
+
+<Tip>
+Be specific about your use case when requesting approval. Include details about:
+- Whether the data will be public or private
+- How frequently you'll access their website
+- The purpose of your application
+- Any commercial interests involved
+</Tip>
+
+## Legal considerations
+
+### Web scraping legality
+
+Web scraping occupies a legal gray area. Consider these factors:
+
+1. **Terms of Service**: Check the Uganda Securities Exchange website's terms of service
+2. **robots.txt**: Respect the directives in the website's robots.txt file
+3. **Copyright**: The data may be subject to copyright protection
+4. **Data ownership**: Determine who owns the rights to the market data
+
+<Warning>
+Violating a website's terms of service could result in:
+- Legal action
+- IP address blocking
+- Cease and desist orders
+- Potential liability for damages
+</Warning>
+
+### Data sources
+
+This library scrapes data from multiple sources:
+
+1. **Uganda Securities Exchange** (use.or.ug)
+   - Market snapshot data
+   - Company listings and details
+   - Stock price data
+
+2. **African Financials** (africanfinancials.com)
+   - Exchange rate information
+   - Currency conversion data
+
+<Note>
+Each data source may have its own terms of service and usage policies. Review all applicable terms before using the library.
+</Note>
+
+## Compliance requirements
+
+### Development vs. Production
+
+#### Development and testing
+
+For development, testing, and personal learning:
+- Generally acceptable without formal approval
+- Use responsibly with reasonable request rates
+- Do not overload the source websites
+- Implement proper caching to minimize requests
+
+#### Production use
+
+For production applications:
+- **Required**: Approval from Uganda Securities Commission
+- **Required**: Compliance with all applicable laws and regulations
+- **Recommended**: Legal consultation
+- **Recommended**: Direct API access if available
+
+<Warning>
+Never deploy this library in production without obtaining proper authorization from the Uganda Securities Commission.
+</Warning>
+
+### Financial regulations
+
+Depending on your use case, you may need to comply with:
+
+1. **Securities regulations**: If providing investment advice or services
+2. **Data protection laws**: If storing personal or company information
+3. **Financial reporting requirements**: If using data for official reports
+4. **Cross-border data transfer**: If accessing data from outside Uganda
+
+### Attribution and disclaimers
+
+When using data from this library:
+
+1. **Attribute the source**: Clearly state that data comes from the Uganda Securities Exchange
+2. **Include disclaimers**: Inform users that this is unofficial data
+3. **Add data freshness indicators**: Show when data was last updated
+4. **Clarify limitations**: Explain any known data quality issues
+
+<Tip>
+The exchange rate method already includes disclaimer content from the source:
+```php
+$disclaimerContent = $disclaimerDiv ? $disclaimerDiv->innertext : '';
+```
+Consider displaying this to end users.
+</Tip>
+
+## Best practices
+
+### Responsible scraping
+
+1. **Rate limiting**: Implement delays between requests
+   ```php
+   sleep(1); // Wait 1 second between requests
+   ```
+
+2. **Caching**: Store results to minimize redundant requests
+   ```php
+   // Cache for 5 minutes
+   $cacheExpiry = 300;
+   ```
+
+3. **User agent**: Use a descriptive user agent string
+   ```php
+   $userAgent = 'YourAppName/1.0 (contact@example.com)';
+   ```
+
+4. **Error handling**: Handle failures gracefully without retrying aggressively
+
+<Note>
+The library already implements custom user agents for exchange rate scraping:
+```php
+$userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)...';
+```
+See implementation in `/home/daytona/workspace/source/PortfolioManager.php:195`
+</Note>
+
+### Data accuracy and reliability
+
+Web scraping introduces potential issues:
+
+1. **Data freshness**: Scraped data may not be real-time
+2. **Parsing errors**: Website changes can break scraping logic
+3. **Network failures**: Requests may fail or timeout
+4. **Data completeness**: Some data points may be missing
+
+<Warning>
+Never rely solely on scraped data for critical financial decisions. Always:
+- Implement validation and error checking
+- Display data age/freshness to users
+- Include appropriate disclaimers
+- Validate data against official sources when possible
+</Warning>
+
+### Privacy and data protection
+
+If your application stores or processes scraped data:
+
+1. **Comply with data protection laws**: Uganda Data Protection and Privacy Act, GDPR (if applicable)
+2. **Secure storage**: Encrypt sensitive data
+3. **Access controls**: Limit who can access the data
+4. **Data retention**: Delete data when no longer needed
+5. **User privacy**: Don't share or sell scraped data without permission
+
+## Alternative approaches
+
+### Official API
+
+Before using this library, check if the Uganda Securities Exchange offers:
+- Official API access
+- Data feeds or subscriptions
+- Partnership opportunities
+- Bulk data downloads
+
+<Info>
+Using official data sources is always preferable to web scraping. Contact the USE to inquire about official API access.
+</Info>
+
+### Third-party data providers
+
+Consider licensed financial data providers:
+- Bloomberg
+- Reuters
+- African financial data aggregators
+- Regional stock exchange data providers
+
+### Direct partnerships
+
+For commercial applications, explore:
+- Data licensing agreements with the USE
+- Partnerships with licensed securities dealers
+- Collaboration with the Uganda Securities Commission
+
+## Liability disclaimer
+
+<Warning>
+The developers of this library provide it "as is" without warranty of any kind. Users are solely responsible for:
+- Obtaining necessary approvals and licenses
+- Complying with all applicable laws and regulations
+- Any consequences of using this library
+- Ensuring data accuracy and reliability
+</Warning>
+
+## Getting started
+
+### For development and learning
+
+1. Clone the repository
+2. Review the source code to understand how it works
+3. Test with minimal requests
+4. Implement caching and rate limiting
+5. Use only for non-commercial purposes
+
+### For production use
+
+1. **First**: Contact the Uganda Securities Commission for approval
+2. **Second**: Consult with legal counsel
+3. **Third**: Implement robust error handling and monitoring
+4. **Fourth**: Add appropriate disclaimers and attributions
+5. **Finally**: Deploy with proper rate limiting and caching
+
+<Tip>
+The README states: "Use of the API for production purposes needs approval from the Uganda Securities Commission, you'll need to visit their website and email them incase you need to use the data from their website."
+</Tip>
+
+## Summary
+
+This library provides a convenient way to access Uganda Securities Exchange data, but comes with important responsibilities:
+
+- Obtain proper authorization before production use
+- Comply with all applicable laws and regulations
+- Respect the source websites' resources and policies
+- Implement responsible scraping practices
+- Provide appropriate disclaimers to end users
+- Consider official alternatives when available
+
+When in doubt, consult with legal professionals and regulatory authorities before deploying applications that use this library.
