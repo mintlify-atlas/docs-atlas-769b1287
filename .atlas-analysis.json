@@ -1,0 +1,67 @@
+{
+  "projectType": "sdk-library",
+  "projectName": "Uganda Securities Exchange API",
+  "projectDescription": "Unofficial PHP library to scrape and retrieve market data from the Uganda Securities Exchange website.",
+  "theme": "aspen",
+  "primaryColor": "#16a34a",
+  "lightColor": "#22c55e",
+  "darkColor": "#15803d",
+  "navigation": {
+    "groups": [
+      {
+        "group": "Get Started",
+        "pages": [
+          "introduction",
+          "installation",
+          "quickstart"
+        ]
+      },
+      {
+        "group": "Core Concepts",
+        "pages": [
+          "concepts/web-scraping",
+          "concepts/legal-compliance"
+        ]
+      },
+      {
+        "group": "API Reference",
+        "pages": [
+          "api/portfolio-manager",
+          "api/get-all-companies",
+          "api/get-company-details",
+          "api/get-company-data",
+          "api/get-exchange-rate"
+        ]
+      },
+      {
+        "group": "Examples",
+        "pages": [
+          "examples/basic-usage",
+          "examples/company-lookup",
+          "examples/market-data"
+        ]
+      },
+      {
+        "group": "Resources",
+        "pages": [
+          "troubleshooting",
+          "contributing",
+          "changelog"
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Retrieve all listed companies from Uganda Securities Exchange",
+    "Fetch detailed company information including ISIN, market cap, and contact details",
+    "Access historical stock price data with OHLC values",
+    "Get current UGX to USD exchange rates",
+    "Built on Simple HTML DOM Parser for reliable web scraping"
+  ],
+  "publicApiSurface": [
+    "PortfolioManager::getAllPortfolioCompanies()",
+    "PortfolioManager::getCompanyDetails($companyName)",
+    "PortfolioCompanyData::getPortfolioCompanyData($companyName)",
+    "PortfolioManager::getExchangeRateDetails()"
+  ]
+}
