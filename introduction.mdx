@@ -5,12 +5,12 @@ description: Unofficial PHP library to access market data from the Uganda Securi
 
 <img
   className="block dark:hidden"
-  src="/images/hero-light.svg"
+  src="/images/hero-light.png"
   alt="Uganda Securities Exchange API Hero Light"
 />
 <img
   className="hidden dark:block"
-  src="/images/hero-dark.svg"
+  src="/images/hero-dark.png"
   alt="Uganda Securities Exchange API Hero Dark"
 />
 
@@ -63,7 +63,7 @@ The Uganda Securities Exchange API is an unofficial PHP library that enables dev
     icon="download"
     href="/installation"
   >
-    Install the library in your PHP project using Composer or manual download
+    Install the library in your PHP project using manual download
   </Card>
   <Card
     title="Quickstart"
@@ -97,7 +97,7 @@ The library uses web scraping to extract data from the Uganda Securities Exchang
 - `getPortfolioCompanyData($companyName)` - Fetches historical OHLC price data from the exchange's data endpoint
 - `getExchangeRateDetails()` - Scrapes current UGX exchange rates from African Financials
 
-All methods return JSON-formatted data for easy integration with your applications.
+Most methods return JSON-formatted data for easy integration with your applications. Note that `getPortfolioCompanyData()` outputs data directly using `echo` rather than returning it.
 
 <Warning>
   This library relies on web scraping and may break if the Uganda Securities Exchange website structure changes. Always implement proper error handling in production environments.

@@ -95,9 +95,9 @@ echo "Company Details for BOBU:\n";
 echo $companyDetails . "\n\n";
 
 // 3. Get historical data for a company
-$companyData = $portfolioManager->getPortfolioCompanyData('BOBU');
 echo "Historical Data for BOBU:\n";
-echo $companyData . "\n\n";
+$portfolioManager->getPortfolioCompanyData('BOBU');
+echo "\n\n";
 
 // 4. Get current exchange rates
 $exchangeRates = $portfolioManager->getExchangeRateDetails();

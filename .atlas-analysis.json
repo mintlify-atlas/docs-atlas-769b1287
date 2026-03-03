@@ -61,7 +61,7 @@
   "publicApiSurface": [
     "PortfolioManager::getAllPortfolioCompanies()",
     "PortfolioManager::getCompanyDetails($companyName)",
-    "PortfolioCompanyData::getPortfolioCompanyData($companyName)",
+    "PortfolioManager::getPortfolioCompanyData($companyName)",
     "PortfolioManager::getExchangeRateDetails()"
   ]
 }
